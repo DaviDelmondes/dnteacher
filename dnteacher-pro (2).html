@@ -1,0 +1,2771 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DN Teacher — Tecnologia para Negócios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Geist+Mono:wght@300;400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    :root {
+      --ink: #04060a;
+      --ink2: #080c12;
+      --ink3: #0c1219;
+      --ink4: #111c26;
+      --blue: #0ea5ff;
+      --blue-dim: rgba(14, 1 65, 255, .08);
+      --blue-border: rgba(14, 165, 255, .16);
+      --white: #edf2f8;
+      --white2: #b8c8d8;
+      --muted: #5a7080;
+      --muted2:
+
+
+        position:fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--ink);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      pointer-events: none;
+    }
+
+    #intro-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      opacity: 0;
+    }
+
+    .intro-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--blue);
+      margin-bottom: 10px;
+      margin-left: 2px;
+      box-shadow: 0 0 20px var(--blue), 0 0 40px rgba(14, 165, 255, .5);
+    }
+
+    .intro-line {
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      opacity: 0;
+    }
+
+    .intro-sub {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--muted);
+      opacity: 0;
+    }
+
+    /* ── 3D CANVAS ── */
+    #three-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 2s ease;
+    }
+
+    #three-canvas.ready {
+      opacity: 1
+    }
+
+    /* ── SECTION CANVASES ── */
+    .sec-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.2s ease;
+    }
+
+    .sec-canvas.active {
+      opacity: 1
+    }
+
+    nav,
+    section,
+    footer {
+      position: relative;
+      z-index: 1
+    }
+
+    section {
+      overflow: hidden
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 28px
+    }
+
+    /* ── PERSPECTIVE CONTAINERS (for 3D child transforms) ── */
+    .why-grid,
+    .bento,
+    .nicho-grid,
+    .steps,
+    .port-grid {
+      perspective: 1200px
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      height: 66px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+      background: rgba(4, 6, 10, .65);
+      backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid transparent;
+      transition: border-color .4s, background .4s;
+      opacity: 0;
+    }
+
+    nav.scrolled {
+      border-bottom-color: var(--blue-border);
+      background: rgba(4, 6, 10, .9)
+    }
+
+    .nav-inner {
+      max-width: 1180px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: var(--white);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 2px
+    }
+
+    .logo-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--blue);
+      margin-bottom: 7px;
+      margin-left: 1px;
+      box-shadow: 0 0 10px var(--blue), 0 0 20px rgba(14, 165, 255, .4);
+      animation: dp 2.4s ease-in-out infinite
+    }
+
+    @keyframes dp {
+
+      0%,
+      100% {
+        box-shadow: 0 0 8px var(--blue), 0 0 14px rgba(14, 165, 255, .3)
+      }
+
+      50% {
+        box-shadow: 0 0 18px var(--blue), 0 0 36px rgba(14, 165, 255, .55)
+      }
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s
+    }
+
+    .nav-links a:hover {
+      color: var(--white)
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 9px 20px;
+      border-radius: 7px;
+      text-decoration: none;
+      transition: box-shadow .3s, transform .25s
+    }
+
+    .nav-cta:hover {
+      box-shadow: 0 0 28px rgba(14, 165, 255, .5);
+      transform: translateY(-2px)
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none
+    }
+
+    .hamburger span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--white);
+      border-radius: 2px
+    }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px
+    }
+
+    .hero-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: rgba(14, 165, 255, .06);
+      border: 1px solid var(--blue-border);
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 32px;
+      display: inline-flex;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: dp 1.8s ease-in-out infinite
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 5.5vw, 5.4rem);
+      font-weight: 800;
+      line-height: .97;
+      letter-spacing: -.04em;
+      margin-bottom: 30px;
+      /* perspective applied via GSAP */
+    }
+
+    .h1-line {
+      display: block;
+      overflow: hidden
+    }
+
+    .h1-word {
+      display: inline-block;
+      transform-origin: 50% 100%
+    }
+
+    h1 em {
+      font-style: italic;
+      font-weight: 400;
+      font-family: 'Instrument Sans', sans-serif;
+      color: var(--blue)
+    }
+
+    .hero-sub {
+      font-size: 18px;
+      color: var(--white2);
+      max-width: 460px;
+      margin-bottom: 44px;
+      line-height: 1.8
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 56px
+    }
+
+    .btn-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--blue);
+      color: var(--ink);
+      font-weight: 600;
+      font-size: 14px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: box-shadow .3s, transform .25s
+    }
+
+    .btn-main:hover {
+      box-shadow: 0 0 36px rgba(14, 165, 255, .5);
+      transform: translateY(-2px)
+    }
+
+    .btn-sec {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid var(--border);
+      color: var(--white2);
+      font-weight: 500;
+      font-size: 14px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: border-color .25s, background .25s, transform .25s
+    }
+
+    .btn-sec:hover {
+      border-color: var(--blue-border);
+      background: var(--blue-dim);
+      transform: translateY(-2px)
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 40px;
+      flex-wrap: wrap;
+      padding-top: 40px;
+      border-top: 1px solid var(--border)
+    }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -.03em;
+      color: var(--blue);
+      line-height: 1
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    .hero-right {
+      display: flex;
+      justify-content: center
+    }
+
+    .terminal {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(8, 12, 18, .75);
+      border: 1px solid var(--blue-border);
+      border-radius: 14px;
+      overflow: hidden;
+      backdrop-filter: blur(24px);
+      box-shadow: 0 0 0 1px rgba(14, 165, 255, .06), 0 40px 80px rgba(0, 0, 0, .4)
+    }
+
+    .term-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 13px 18px;
+      background: rgba(12, 18, 25, .85);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .td {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%
+    }
+
+    .td1 {
+      background: #ff5f57
+    }
+
+    .td2 {
+      background: #febc2e
+    }
+
+    .td3 {
+      background: #28c840
+    }
+
+    .term-file {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-left: auto
+    }
+
+    .term-body {
+      padding: 22px 24px
+    }
+
+    .tl {
+      font-family: 'Geist Mono', monospace;
+      font-size: 13px;
+      line-height: 2.1
+    }
+
+    .tl-blank {
+      height: 6px
+    }
+
+    .k {
+      color: #c792ea
+    }
+
+    .s {
+      color: #c3e88d
+    }
+
+    .n {
+      color: #f78c6c
+    }
+
+    .c {
+      color: var(--muted2)
+    }
+
+    .ok {
+      color: var(--green)
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 15px;
+      background: var(--blue);
+      vertical-align: text-bottom;
+      margin-left: 2px;
+      animation: blink 1.1s step-end infinite
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0
+      }
+    }
+
+    /* ── TICKER ── */
+    .ticker-wrap {
+      overflow: hidden;
+      background: rgba(8, 12, 18, .8);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 0
+    }
+
+    .ticker-track {
+      display: flex;
+      width: max-content;
+      animation: ticker 28s linear infinite
+    }
+
+    .ticker-track:hover {
+      animation-play-state: paused
+    }
+
+    .t-item {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      padding: 0 28px
+    }
+
+    .t-sep {
+      color: var(--blue);
+      opacity: .5
+    }
+
+    @keyframes ticker {
+      0% {
+        transform: translateX(0)
+      }
+
+      100% {
+        transform: translateX(-50%)
+      }
+    }
+
+    /* ── SECTION COMMON ── */
+    section {
+      padding: 110px 0
+    }
+
+    .s-eye {
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .s-eye::before {
+      content: '';
+      display: inline-block;
+      width: 22px;
+      height: 1px;
+      background: var(--blue)
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 3.8vw, 3.4rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+      margin-bottom: 18px
+    }
+
+    .s-desc {
+      font-size: 17px;
+      color: var(--white2);
+      max-width: 540px;
+      line-height: 1.8
+    }
+
+    /* ── WHY ── */
+    #why {
+      background: rgba(8, 12, 18, .82);
+      backdrop-filter: blur(10px)
+    }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 56px 80px;
+      margin-top: 64px
+    }
+
+    .why-item {
+      will-change: transform, opacity
+    }
+
+    .why-icon {
+      width: 50px;
+      height: 50px;
+      background: var(--blue-dim);
+      border: 1px solid var(--blue-border);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-bottom: 18px;
+      transition: transform .3s, box-shadow .3s
+    }
+
+    .why-item:hover .why-icon {
+      transform: scale(1.1);
+      box-shadow: 0 0 24px rgba(14, 165, 255, .2)
+    }
+
+    .why-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px
+    }
+
+    .why-desc {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.75
+    }
+
+    /* ── SERVICES ── */
+    #servicos {
+      background: rgba(4, 6, 10, .78);
+      backdrop-filter: blur(10px)
+    }
+
+    .bento {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      margin-top: 56px
+    }
+
+    .b {
+      background: rgba(8, 12, 18, .88);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 34px;
+      position: relative;
+      overflow: hidden;
+      will-change: transform, opacity;
+      backdrop-filter: blur(8px);
+      transition: border-color .3s, box-shadow .3s
+    }
+
+    .b:hover {
+      border-color: var(--blue-border);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, .3), 0 0 0 1px rgba(14, 165, 255, .07)
+    }
+
+    .b::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 50%;
+      height: 200%;
+      background: linear-gradient(105deg, transparent 40%, rgba(14, 165, 255, .05) 50%, transparent 60%);
+      transform: skewX(-15deg);
+      transition: left .6s ease;
+      pointer-events: none
+    }
+
+    .b:hover::after {
+      left: 130%
+    }
+
+    .b::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      opacity: 0;
+      transition: opacity .3s
+    }
+
+    .b:hover::before {
+      opacity: 1
+    }
+
+    .b1 {
+      grid-column: span 5
+    }
+
+    .b2 {
+      grid-column: span 7
+    }
+
+    .b3 {
+      grid-column: span 4
+    }
+
+    .b4 {
+      grid-column: span 4
+    }
+
+    .b5 {
+      grid-column: span 4
+    }
+
+    .b6 {
+      grid-column: span 6
+    }
+
+    .b7 {
+      grid-column: span 6
+    }
+
+    .b-hl {
+      background: linear-gradient(135deg, rgba(10, 22, 32, .95), rgba(8, 20, 40, .95));
+      border-color: var(--blue-border)
+    }
+
+    .b-num {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .18em;
+      color: var(--blue);
+      opacity: .55;
+      margin-bottom: 18px
+    }
+
+    .b-icon {
+      font-size: 34px;
+      margin-bottom: 16px;
+      display: block;
+      transition: transform .3s
+    }
+
+    .b:hover .b-icon {
+      transform: scale(1.15) rotate(-3deg)
+    }
+
+    .b-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -.02em
+    }
+
+    .b-hl .b-title {
+      color: var(--blue)
+    }
+
+    .b-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 300px
+    }
+
+    .b-tag {
+      display: inline-block;
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .08em;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: var(--muted);
+      margin-top: 16px;
+      margin-right: 5px;
+      transition: border-color .2s, color .2s
+    }
+
+    .b:hover .b-tag {
+      border-color: var(--blue-border);
+      color: var(--blue)
+    }
+
+    /* ── NICHOS ── */
+    #nichos {
+      background: rgba(8, 12, 18, .82);
+      backdrop-filter: blur(10px)
+    }
+
+    .nichos-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      margin-bottom: 60px
+    }
+
+    .nicho-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      position: relative;
+      z-index: 1
+    }
+
+    .nicho-card {
+      background: rgba(12, 18, 25, .85);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 16px;
+      text-align: center;
+      will-change: transform, opacity;
+      cursor: pointer;
+      transition: border-color .25s, background .25s, box-shadow .25s
+    }
+
+    .nicho-card:hover,
+    .nicho-card.hovered {
+      border-color: var(--blue-border);
+      background: rgba(17, 28, 38, .95);
+      box-shadow: 0 0 40px rgba(14, 165, 255, .15);
+      transform: translateY(-5px) !important
+    }
+
+    .nicho-emoji {
+      font-size: 32px;
+      margin-bottom: 12px;
+      display: block;
+      transition: transform .3s
+    }
+
+    .nicho-card:hover .nicho-emoji,
+    .nicho-card.hovered .nicho-emoji {
+      transform: scale(1.2)
+    }
+
+    .nicho-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .nicho-needs {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6
+    }
+
+    /* ── PROCESS ── */
+    #processo {
+      background: rgba(4, 6, 10, .78);
+      backdrop-filter: blur(10px)
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 56px;
+      position: relative
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 30px;
+      left: calc(12.5% + 10px);
+      right: calc(12.5% + 10px);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue-border) 20%, var(--blue) 50%, var(--blue-border) 80%, transparent)
+    }
+
+    .step {
+      background: rgba(8, 12, 18, .88);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 34px 24px;
+      text-align: center;
+      will-change: transform, opacity;
+      transition: border-color .3s, box-shadow .3s;
+      backdrop-filter: blur(8px)
+    }
+
+    .step:hover {
+      border-color: var(--blue-border);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .25)
+    }
+
+    .step-n {
+      width: 46px;
+      height: 46px;
+      background: var(--blue);
+      color: var(--ink);
+      font-family: 'Syne', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 22px;
+      transition: box-shadow .3s
+    }
+
+    .step:hover .step-n {
+      box-shadow: 0 0 24px rgba(14, 165, 255, .5), 0 0 0 6px rgba(14, 165, 255, .1)
+    }
+
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 10px
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.75
+    }
+
+    /* ── PORTFOLIO ── */
+    #projetos {
+      background: rgba(8, 12, 18, .82);
+      backdrop-filter: blur(10px)
+    }
+
+    .port-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+      gap: 20px
+    }
+
+    .port-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px
+    }
+
+    .port-card {
+      background: rgba(12, 18, 25, .9);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      will-change: transform, opacity;
+      transition: border-color .3s, box-shadow .3s
+    }
+
+    .port-card:hover {
+      border-color: var(--blue-border);
+      box-shadow: 0 28px 72px rgba(0, 0, 0, .35);
+      transform: translateY(-5px) !important
+    }
+
+    .port-preview {
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 56px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .pp1 {
+      background: linear-gradient(135deg, #040e1a, #091b30)
+    }
+
+    .pp2 {
+      background: linear-gradient(135deg, #0e0620, #1c0a38)
+    }
+
+    .pp3 {
+      background: linear-gradient(135deg, #04120e, #072418)
+    }
+
+    .pp4 {
+      background: linear-gradient(135deg, #180d04, #281608)
+    }
+
+    .port-preview::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 60%, rgba(14, 165, 255, .08), transparent 65%)
+    }
+
+    .port-emoji {
+      position: relative;
+      z-index: 1;
+      transition: transform .4s
+    }
+
+    .port-card:hover .port-emoji {
+      transform: scale(1.15) translateY(-4px)
+    }
+
+    .port-badge {
+      position: absolute;
+      bottom: 14px;
+      right: 16px;
+      z-index: 1;
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      background: rgba(0, 0, 0, .55);
+      padding: 4px 10px;
+      border-radius: 4px
+    }
+
+    .port-body {
+      padding: 28px
+    }
+
+    .port-niche {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      color: var(--blue);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: 8px
+    }
+
+    .port-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -.02em
+    }
+
+    .port-desc {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 18px;
+      line-height: 1.75
+    }
+
+    .port-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .port-pill {
+      font-family: 'Geist Mono', monospace;
+      font-size: 10px;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 4px;
+      color: var(--muted2);
+      transition: border-color .2s, color .2s
+    }
+
+    .port-card:hover .port-pill {
+      border-color: var(--blue-border);
+      color: var(--blue)
+    }
+
+    /* ── CONTACT ── */
+    #contato {
+      background: rgba(4, 6, 10, .78);
+      backdrop-filter: blur(10px)
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start
+    }
+
+    .cf {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      will-change: transform, opacity
+    }
+
+    .cf:first-of-type {
+      border-top: 1px solid var(--border)
+    }
+
+    .cf-icon {
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
+      background: var(--blue-dim);
+      border: 1px solid var(--blue-border);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px
+    }
+
+    .cf-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 3px
+    }
+
+    .cf-val {
+      font-size: 15px;
+      font-weight: 500
+    }
+
+    .form-card {
+      background: rgba(8, 12, 18, .88);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 42px;
+      backdrop-filter: blur(12px);
+      will-change: transform, opacity
+    }
+
+    .form-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 23px;
+      font-weight: 700;
+      margin-bottom: 6px
+    }
+
+    .form-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 32px
+    }
+
+    .field {
+      margin-bottom: 18px
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .04em;
+      color: var(--white2);
+      margin-bottom: 8px
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      background: rgba(12, 18, 25, .8);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 13px 16px;
+      font-size: 14px;
+      color: var(--white);
+      font-family: 'Instrument Sans', sans-serif;
+      outline: none;
+      resize: vertical;
+      transition: border-color .2s, box-shadow .2s
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--blue-border);
+      box-shadow: 0 0 0 3px rgba(14, 165, 255, .08)
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: var(--muted2)
+    }
+
+    .field select option {
+      background: var(--ink3)
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--blue);
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 15px;
+      padding: 15px;
+      border-radius: 9px;
+      border: none;
+      cursor: pointer;
+      font-family: 'Instrument Sans', sans-serif;
+      transition: box-shadow .3s, transform .25s;
+      margin-top: 8px
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 0 32px rgba(14, 165, 255, .45);
+      transform: translateY(-2px)
+    }
+
+    .form-note {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 14px
+    }
+
+    .form-ok {
+      display: none;
+      background: rgba(0, 217, 126, .08);
+      border: 1px solid rgba(0, 217, 126, .22);
+      border-radius: 9px;
+      padding: 16px;
+      text-align: center;
+      color: var(--green);
+      font-size: 14px;
+      margin-top: 16px
+    }
+
+    .form-ok.show {
+      display: block
+    }
+
+    /* ── FAQ ── */
+    #faq {
+      background: rgba(8, 12, 18, .82);
+      backdrop-filter: blur(10px)
+    }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 56px
+    }
+
+    .faq-item {
+      background: rgba(12, 18, 25, .9);
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      overflow: hidden;
+      will-change: transform, opacity;
+      transition: border-color .2s
+    }
+
+    .faq-item:hover {
+      border-color: var(--blue-border)
+    }
+
+    .faq-q {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 15px;
+      gap: 16px
+    }
+
+    .faq-chev {
+      min-width: 24px;
+      height: 24px;
+      background: var(--blue-dim);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--blue);
+      font-size: 12px;
+      transition: transform .35s
+    }
+
+    .faq-item.open .faq-chev {
+      transform: rotate(180deg)
+    }
+
+    .faq-a {
+      max-height: 0;
+      overflow: hidden;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+      transition: max-height .4s ease, padding .35s;
+      padding: 0 24px
+    }
+
+    .faq-item.open .faq-a {
+      max-height: 200px;
+      padding: 0 24px 20px
+    }
+
+    /* ── CTA ── */
+    #cta {
+      padding: 130px 0;
+      text-align: center;
+      background: rgba(4, 6, 10, .78);
+      backdrop-filter: blur(10px)
+    }
+
+    .cta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue-dim);
+      border: 1px solid var(--blue-border);
+      padding: 7px 18px;
+      border-radius: 100px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 32px
+    }
+
+    .cta-h {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 5.5vw, 5.2rem);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1;
+      max-width: 800px;
+      margin: 0 auto 28px
+    }
+
+    .cta-h em {
+      font-style: italic;
+      font-weight: 400;
+      font-family: 'Instrument Sans', sans-serif;
+      color: var(--blue)
+    }
+
+    .cta-sub {
+      font-size: 18px;
+      color: var(--white2);
+      max-width: 480px;
+      margin: 0 auto 48px;
+      line-height: 1.8
+    }
+
+    .cta-btns {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap
+    }
+
+    .cta-inner {
+      position: relative;
+      z-index: 1
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: rgba(8, 12, 18, .92);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      padding: 52px 0 32px
+    }
+
+    .foot-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px
+    }
+
+    .foot-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-bottom: 14px
+    }
+
+    .foot-tagline {
+      font-size: 14px;
+      color: var(--muted);
+      max-width: 230px;
+      line-height: 1.7
+    }
+
+    .foot-col-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--white2);
+      margin-bottom: 16px
+    }
+
+    .foot-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .foot-col a {
+      font-size: 14px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color .2s, transform .2s;
+      display: inline-block
+    }
+
+    .foot-col a:hover {
+      color: var(--blue);
+      transform: translateX(4px)
+    }
+
+    .foot-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px
+    }
+
+    .foot-copy {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .foot-socials {
+      display: flex;
+      gap: 10px
+    }
+
+    .foot-socials a {
+      width: 36px;
+      height: 36px;
+      background: rgba(12, 18, 25, .9);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: border-color .2s, color .2s, transform .2s
+    }
+
+    .foot-socials a:hover {
+      border-color: var(--blue-border);
+      color: var(--blue);
+      transform: translateY(-2px)
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:980px) {
+
+      .hero-inner,
+      .nichos-wrap,
+      .contact-grid {
+        grid-template-columns: 1fr
+      }
+
+      .hero-right {
+        display: none
+      }
+
+      .bento {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .b1,
+      .b2,
+      .b3,
+      .b4,
+      .b5,
+      .b6,
+      .b7 {
+        grid-column: span 1
+      }
+
+      .b1 {
+        grid-column: span 2
+      }
+
+      .steps {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .steps::before {
+        display: none
+      }
+
+      .port-grid,
+      .why-grid,
+      .faq-grid {
+        grid-template-columns: 1fr
+      }
+
+      .foot-grid {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .nicho-grid {
+        grid-template-columns: repeat(3, 1fr)
+      }
+    }
+
+    @media(max-width:640px) {
+      .nav-links {
+        display: none
+      }
+
+      .nav-links.open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 66px;
+        left: 0;
+        right: 0;
+        background: rgba(8, 12, 18, .97);
+        border-bottom: 1px solid var(--border);
+        padding: 20px 28px;
+        gap: 18px
+      }
+
+      .hamburger {
+        display: flex
+      }
+
+      .bento,
+      .steps,
+      .nicho-grid {
+        grid-template-columns: 1fr
+      }
+
+      .b1,
+      .b2,
+      .b3,
+      .b4,
+      .b5,
+      .b6,
+      .b7 {
+        grid-column: span 1
+      }
+
+      .field-row,
+      .foot-grid {
+        grid-template-columns: 1fr
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ═══ INTRO SCREEN ═══ -->
+  <div id="intro">
+    <div id="intro-logo">DN<div class="intro-dot"></div>Teacher</div>
+    <div class="intro-line" id="intro-line"></div>
+    <div class="intro-sub" id="intro-sub">Tecnologia para Negócios</div>
+  </div>
+
+  <!-- 3D CANVAS -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="nav-inner">
+      <a href="#hero" class="logo" id="logo">DN<div class="logo-dot"></div>Teacher</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#why">Por que nós</a></li>
+        <li><a href="#servicos">Serviços</a></li>
+        <li><a href="#nichos">Nichos</a></li>
+        <li><a href="#projetos">Projetos</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a href="#contato" class="nav-cta" id="navCta">Orçamento grátis →</a>
+      <button class="hamburger" id="hbg"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div>
+          <div class="hero-badge" id="heroBadge">
+            <div class="badge-dot"></div>Disponível para novos projetos
+          </div>
+          <h1 id="heroH1">
+            <span class="h1-line"><span class="h1-word" id="hw0">Tecnologia</span></span>
+            <span class="h1-line"><span class="h1-word" id="hw1">que faz</span></span>
+            <span class="h1-line"><span class="h1-word" id="hw2"><em>negócios</em></span></span>
+            <span class="h1-line"><span class="h1-word" id="hw3">crescerem.</span></span>
+          </h1>
+          <p class="hero-sub" id="heroSub">Sites, sistemas e automações criados sob medida para pequenas empresas que
+            querem resultados reais no mundo digital.</p>
+          <div class="hero-btns" id="heroBtns">
+            <a href="#contato" class="btn-main" id="btn1"><svg width="16" height="16" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                  d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+              </svg>Falar no WhatsApp</a>
+            <a href="#projetos" class="btn-sec" id="btn2">Ver projetos →</a>
+          </div>
+          <div class="hero-stats" id="heroStats">
+            <div>
+              <div class="stat-num" data-count="6" data-suf="">0</div>
+              <div class="stat-label">Serviços disponíveis</div>
+            </div>
+            <div>
+              <div class="stat-num" data-count="5" data-suf="">0</div>
+              <div class="stat-label">Nichos atendidos</div>
+            </div>
+            <div>
+              <div class="stat-num" data-count="100" data-suf="%">0%</div>
+              <div class="stat-label">Foco em resultado</div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-right" id="heroRight">
+          <div class="terminal">
+            <div class="term-bar">
+              <div class="td td1"></div>
+              <div class="td td2"></div>
+              <div class="td td3"></div>
+              <div class="term-file">~/dnteacher/projeto.ts</div>
+            </div>
+            <div class="term-body">
+              <div class="tl"><span class="c">// DN Teacher — stack tecnológica</span></div>
+              <div class="tl-blank"></div>
+              <div class="tl"><span class="k">interface</span> <span style="color:#82b1ff">Solucao</span> {</div>
+              <div class="tl">&nbsp;&nbsp;tipo: <span class="s">'site'</span> | <span class="s">'sistema'</span> | <span
+                  class="s">'app'</span>;</div>
+              <div class="tl">&nbsp;&nbsp;prazo: <span class="k">number</span>;&nbsp;<span class="c">// dias</span>
+              </div>
+              <div class="tl">&nbsp;&nbsp;resultado: <span class="s">'crescimento'</span>;</div>
+              <div class="tl">}</div>
+              <div class="tl-blank"></div>
+              <div class="tl"><span class="k">const</span> projeto = <span class="k">await</span> DN.build({</div>
+              <div class="tl">&nbsp;&nbsp;banco: <span class="s">'Neon PostgreSQL'</span>,</div>
+              <div class="tl">&nbsp;&nbsp;deploy: <span class="s">'Vercel'</span>,&nbsp;<span class="c">// grátis</span>
+              </div>
+              <div class="tl">&nbsp;&nbsp;prazo: <span class="n">30</span>,</div>
+              <div class="tl">});</div>
+              <div class="tl-blank"></div>
+              <div class="tl"><span class="ok">✓ Deploy realizado com sucesso!</span><span class="cursor"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker-wrap" id="ticker">
+    <div class="ticker-track">
+      <span class="t-item">Landing Pages <span class="t-sep">◆</span></span><span class="t-item">Sistemas Web <span
+          class="t-sep">◆</span></span><span class="t-item">Apps Mobile <span class="t-sep">◆</span></span><span
+        class="t-item">Automação WhatsApp <span class="t-sep">◆</span></span><span class="t-item">React & Node.js <span
+          class="t-sep">◆</span></span><span class="t-item">Neon PostgreSQL <span class="t-sep">◆</span></span><span
+        class="t-item">Deploy Vercel <span class="t-sep">◆</span></span><span class="t-item">React Native <span
+          class="t-sep">◆</span></span><span class="t-item">Suporte Técnico <span class="t-sep">◆</span></span><span
+        class="t-item">Pequenos Negócios <span class="t-sep">◆</span></span>
+      <span class="t-item">Landing Pages <span class="t-sep">◆</span></span><span class="t-item">Sistemas Web <span
+          class="t-sep">◆</span></span><span class="t-item">Apps Mobile <span class="t-sep">◆</span></span><span
+        class="t-item">Automação WhatsApp <span class="t-sep">◆</span></span><span class="t-item">React & Node.js <span
+          class="t-sep">◆</span></span><span class="t-item">Neon PostgreSQL <span class="t-sep">◆</span></span><span
+        class="t-item">Deploy Vercel <span class="t-sep">◆</span></span><span class="t-item">React Native <span
+          class="t-sep">◆</span></span><span class="t-item">Suporte Técnico <span class="t-sep">◆</span></span><span
+        class="t-item">Pequenos Negócios <span class="t-sep">◆</span></span>
+    </div>
+  </div>
+
+  <!-- WHY -->
+  <section id="why">
+    <div class="container">
+      <div id="whyHead">
+        <div class="s-eye">Por que escolher</div>
+        <h2>O que torna a DN Teacher<br>diferente</h2>
+        <p class="s-desc">Mais do que código — soluções que resolvem problemas reais de negócio.</p>
+      </div>
+      <div class="why-grid">
+        <div class="why-item">
+          <div class="why-icon">🎯</div>
+          <div class="why-title">Foco em resultado, não em processo</div>
+          <div class="why-desc">Cada projeto começa com uma pergunta: qual o problema real do seu negócio? A tecnologia
+            vem como resposta.</div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">⚡</div>
+          <div class="why-title">Entrega rápida sem abrir mão da qualidade</div>
+          <div class="why-desc">Landing pages em até 7 dias. Sistemas em até 30 dias. Processos ágeis para resultados
+            rápidos.</div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">🔧</div>
+          <div class="why-title">Suporte contínuo pós-entrega</div>
+          <div class="why-desc">Não sumimos após o deploy. Manutenção e suporte para que seu sistema evolua com o
+            negócio.</div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">💰</div>
+          <div class="why-title">Preço justo para pequenas empresas</div>
+          <div class="why-desc">Tecnologia de qualidade sem custar uma fortuna. Soluções acessíveis para quem está
+            crescendo.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section id="servicos">
+    <canvas class="sec-canvas" id="canvas-servicos"></canvas>
+    <div class="container" style="position:relative;z-index:1">
+      <div id="servHead">
+        <div class="s-eye">Serviços</div>
+        <h2>O que a DN Teacher<br>constrói para você</h2>
+      </div>
+      <div class="bento">
+        <div class="b b1 b-hl">
+          <div class="b-num">01</div><span class="b-icon">🖥️</span>
+          <div class="b-title">Landing Pages de Alta Conversão</div>
+          <div class="b-desc">Páginas focadas em transformar visitante em cliente. Design moderno, rápidas e otimizadas
+            para SEO.</div><span class="b-tag">React</span><span class="b-tag">TailwindCSS</span><span
+            class="b-tag">Vite</span>
+        </div>
+        <div class="b b2">
+          <div class="b-num">02</div><span class="b-icon">⚙️</span>
+          <div class="b-title">Sistemas Web Personalizados</div>
+          <div class="b-desc">Agendamento online, controle de estoque, gestão financeira — feitos para o fluxo real do
+            seu negócio.</div><span class="b-tag">Node.js</span><span class="b-tag">Neon PostgreSQL</span><span
+            class="b-tag">Prisma</span>
+        </div>
+        <div class="b b3">
+          <div class="b-num">03</div><span class="b-icon">📱</span>
+          <div class="b-title">Apps Mobile</div>
+          <div class="b-desc">iOS e Android com React Native. Performance nativa e design moderno.</div><span
+            class="b-tag">React Native</span><span class="b-tag">Expo</span>
+        </div>
+        <div class="b b4">
+          <div class="b-num">04</div><span class="b-icon">💬</span>
+          <div class="b-title">Automação WhatsApp</div>
+          <div class="b-desc">Atendimento automático, captação de leads e integração com sistemas.</div><span
+            class="b-tag">API Oficial</span><span class="b-tag">Webhooks</span>
+        </div>
+        <div class="b b5">
+          <div class="b-num">05</div><span class="b-icon">🌐</span>
+          <div class="b-title">Sites Institucionais</div>
+          <div class="b-desc">Presença digital completa com painel de administração e blog integrado.</div><span
+            class="b-tag">CMS</span><span class="b-tag">SEO</span>
+        </div>
+        <div class="b b6">
+          <div class="b-num">06</div><span class="b-icon">🛠️</span>
+          <div class="b-title">Suporte & Manutenção</div>
+          <div class="b-desc">Planos mensais: backup, monitoramento e melhorias contínuas para manter seu sistema
+            funcionando.</div><span class="b-tag">24/7</span><span class="b-tag">Backup</span><span
+            class="b-tag">Updates</span>
+        </div>
+        <div class="b b7" style="display:flex;align-items:center">
+          <div>
+            <div class="b-num">Stack</div>
+            <div class="b-title" style="font-size:18px;margin-bottom:14px">Tecnologias utilizadas</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px"><span class="b-tag"
+                style="color:var(--blue);border-color:var(--blue-border)">React</span><span class="b-tag"
+                style="color:var(--blue);border-color:var(--blue-border)">Node.js</span><span class="b-tag"
+                style="color:var(--blue);border-color:var(--blue-border)">TypeScript</span><span class="b-tag"
+                style="color:var(--blue);border-color:var(--blue-border)">Neon</span><span class="b-tag"
+                style="color:var(--blue);border-color:var(--blue-border)">Prisma</span><span class="b-tag"
+                style="color:var(--blue);border-color:var(--blue-border)">React Native</span><span class="b-tag"
+                style="color:var(--blue);border-color:var(--blue-border)">TailwindCSS</span><span class="b-tag"
+                style="color:var(--blue);border-color:var(--blue-border)">Vercel</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NICHOS -->
+  <section id="nichos">
+    <canvas class="sec-canvas" id="canvas-nichos"></canvas>
+    <div class="container" style="position:relative;z-index:1">
+      <div class="nichos-wrap">
+        <div id="nichosHead">
+          <div class="s-eye">Nichos</div>
+          <h2>Setores que<br>atendemos</h2>
+          <p class="s-desc">Cada negócio tem necessidades específicas. Conhecemos os desafios de cada setor.</p>
+        </div>
+        <div id="nichosDores"
+          style="background:rgba(12,18,25,.9);border:1px solid var(--border);border-radius:14px;padding:28px;backdrop-filter:blur(8px)">
+          <div
+            style="font-family:'Geist Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:16px;letter-spacing:.1em">
+            // dores que resolvemos</div>
+          <div style="display:flex;flex-direction:column;gap:13px">
+            <div style="display:flex;align-items:center;gap:12px;font-size:14px"><span
+                style="color:var(--green);font-size:16px">✓</span><span style="color:var(--white2)">Sem presença digital
+                profissional</span></div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:14px"><span
+                style="color:var(--green);font-size:16px">✓</span><span style="color:var(--white2)">Agenda feita no
+                caderno ou no zap</span></div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:14px"><span
+                style="color:var(--green);font-size:16px">✓</span><span style="color:var(--white2)">Sem controle
+                financeiro real</span></div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:14px"><span
+                style="color:var(--green);font-size:16px">✓</span><span style="color:var(--white2)">Atendimento lento e
+                manual</span></div>
+            <div style="display:flex;align-items:center;gap:12px;font-size:14px"><span
+                style="color:var(--green);font-size:16px">✓</span><span style="color:var(--white2)">Clientes indo para a
+                concorrência</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="nicho-grid">
+        <div class="nicho-card" data-node="0"><span class="nicho-emoji">✂️</span>
+          <div class="nicho-name">Barbearias</div>
+          <div class="nicho-needs">Agendamento · Site · Caixa</div>
+        </div>
+        <div class="nicho-card" data-node="1"><span class="nicho-emoji">🏋️</span>
+          <div class="nicho-name">Academias</div>
+          <div class="nicho-needs">App · Planos · Mensalidades</div>
+        </div>
+        <div class="nicho-card" data-node="2"><span class="nicho-emoji">⛪</span>
+          <div class="nicho-name">Igrejas</div>
+          <div class="nicho-needs">App · Lives · Membros</div>
+        </div>
+        <div class="nicho-card" data-node="3"><span class="nicho-emoji">🍽️</span>
+          <div class="nicho-name">Restaurantes</div>
+          <div class="nicho-needs">Cardápio · Pedidos · Delivery</div>
+        </div>
+        <div class="nicho-card" data-node="4"><span class="nicho-emoji">👤</span>
+          <div class="nicho-name">Autônomos</div>
+          <div class="nicho-needs">Landing page · Agenda · Portfólio</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="processo">
+    <div class="container">
+      <div id="procHead" style="text-align:center">
+        <div class="s-eye" style="justify-content:center">Como funciona</div>
+        <h2>Do orçamento ao deploy<br>em 4 etapas</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-n">1</div>
+          <div class="step-title">Diagnóstico gratuito</div>
+          <div class="step-desc">Conversa pelo WhatsApp para entender seu negócio e qual solução faz mais sentido.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <div class="step-title">Proposta e briefing</div>
+          <div class="step-desc">Proposta detalhada com escopo, prazo e valor. Sem surpresas no meio do projeto.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <div class="step-title">Desenvolvimento</div>
+          <div class="step-desc">Atualizações frequentes. Você acompanha tudo em tempo real.</div>
+        </div>
+        <div class="step">
+          <div class="step-n">4</div>
+          <div class="step-title">Entrega e suporte</div>
+          <div class="step-desc">Deploy, treinamento de uso e suporte pós-entrega inclusos.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section id="projetos">
+    <div class="container">
+      <div class="port-head">
+        <div id="portHead">
+          <div class="s-eye">Projetos</div>
+          <h2>Trabalhos recentes</h2>
+        </div><a href="#contato" class="btn-sec">Quero um projeto assim →</a>
+      </div>
+      <div class="port-grid">
+        <div class="port-card">
+          <div class="port-preview pp1"><span class="port-emoji">✂️</span>
+            <div class="port-badge">Sistema Web</div>
+          </div>
+          <div class="port-body">
+            <div class="port-niche">Barbearia</div>
+            <div class="port-title">BarberPro — Agendamento Online</div>
+            <div class="port-desc">Calendário, perfil dos profissionais, histórico de clientes e controle financeiro
+              integrado.</div>
+            <div class="port-pills"><span class="port-pill">React</span><span class="port-pill">Node.js</span><span
+                class="port-pill">Neon</span><span class="port-pill">Prisma</span></div>
+          </div>
+        </div>
+        <div class="port-card">
+          <div class="port-preview pp2"><span class="port-emoji">🏋️</span>
+            <div class="port-badge">App Mobile</div>
+          </div>
+          <div class="port-body">
+            <div class="port-niche">Academia</div>
+            <div class="port-title">FitPanel — Gestão de Alunos</div>
+            <div class="port-desc">App iOS e Android para matrículas, planos, frequência e fichas de treino.</div>
+            <div class="port-pills"><span class="port-pill">React Native</span><span class="port-pill">Expo</span><span
+                class="port-pill">Prisma</span><span class="port-pill">JWT</span></div>
+          </div>
+        </div>
+        <div class="port-card">
+          <div class="port-preview pp3"><span class="port-emoji">⛪</span>
+            <div class="port-badge">App Institucional</div>
+          </div>
+          <div class="port-body">
+            <div class="port-niche">Igreja</div>
+            <div class="port-title">ChurchApp — Comunidade Digital</div>
+            <div class="port-desc">Lives, pedidos de oração, área dos membros, eventos e dízimos online.</div>
+            <div class="port-pills"><span class="port-pill">React Native</span><span
+                class="port-pill">Node.js</span><span class="port-pill">WebSocket</span><span
+                class="port-pill">Pix</span></div>
+          </div>
+        </div>
+        <div class="port-card">
+          <div class="port-preview pp4"><span class="port-emoji">🍽️</span>
+            <div class="port-badge">Landing + Sistema</div>
+          </div>
+          <div class="port-body">
+            <div class="port-niche">Restaurante</div>
+            <div class="port-title">MenuDigital — Cardápio e Pedidos</div>
+            <div class="port-desc">Cardápio via QR Code, pedidos pelo celular e painel de gestão integrado.</div>
+            <div class="port-pills"><span class="port-pill">React</span><span class="port-pill">QR Code</span><span
+                class="port-pill">WhatsApp API</span><span class="port-pill">Vercel</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contato">
+    <canvas class="sec-canvas" id="canvas-contato"></canvas>
+    <div class="container" style="position:relative;z-index:1">
+      <div class="contact-grid">
+        <div>
+          <div id="contactHead">
+            <div class="s-eye">Contato</div>
+            <h2>Vamos construir<br>seu projeto</h2>
+            <p class="s-desc" style="margin-bottom:40px">Preencha o formulário ou fale pelo WhatsApp. Respondo em até 2h
+              em dias úteis.</p>
+          </div>
+          <div class="cf">
+            <div class="cf-icon">📱</div>
+            <div>
+              <div class="cf-label">WhatsApp</div>
+              <div class="cf-val">(11) 9XXXX-XXXX</div>
+            </div>
+          </div>
+          <div class="cf">
+            <div class="cf-icon">📧</div>
+            <div>
+              <div class="cf-label">Email</div>
+              <div class="cf-val">davi@dnteacher.dev</div>
+            </div>
+          </div>
+          <div class="cf">
+            <div class="cf-icon">📍</div>
+            <div>
+              <div class="cf-label">Localização</div>
+              <div class="cf-val">São Paulo, SP — atendo todo o Brasil</div>
+            </div>
+          </div>
+          <div class="cf">
+            <div class="cf-icon">⏰</div>
+            <div>
+              <div class="cf-label">Atendimento</div>
+              <div class="cf-val">Seg–Sex, 9h às 18h</div>
+            </div>
+          </div>
+        </div>
+        <div class="form-card" id="formCard">
+          <div class="form-title">Solicitar orçamento</div>
+          <div class="form-sub">Gratuito e sem compromisso. Resposta em até 2 horas.</div>
+          <form id="cForm">
+            <div class="field-row">
+              <div class="field"><label>Nome completo *</label><input type="text" placeholder="João Silva" required
+                  id="fn"></div>
+              <div class="field"><label>WhatsApp *</label><input type="tel" placeholder="(11) 99999-9999" required
+                  id="fp"></div>
+            </div>
+            <div class="field"><label>Email</label><input type="email" placeholder="joao@empresa.com" id="fe"></div>
+            <div class="field"><label>Serviço *</label><select required id="fs">
+                <option value="">Selecione...</option>
+                <option>Landing Page</option>
+                <option>Site Completo</option>
+                <option>Sistema Web</option>
+                <option>Aplicativo Mobile</option>
+                <option>Automação WhatsApp</option>
+                <option>Suporte Técnico</option>
+                <option>Ainda não sei — quero conversar</option>
+              </select></div>
+            <div class="field"><label>Descreva brevemente seu projeto</label><textarea rows="4"
+                placeholder="Ex: Preciso de um sistema de agendamento..." id="fm"></textarea></div>
+            <button type="submit" class="btn-submit">Enviar solicitação →</button>
+            <div class="form-note">🔒 Seus dados são protegidos.</div>
+            <div class="form-ok" id="formOk">✅ Mensagem enviada! Entrarei em contato em breve.</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="container">
+      <div id="faqHead" style="text-align:center;margin-bottom:0">
+        <div class="s-eye" style="justify-content:center">FAQ</div>
+        <h2>Perguntas frequentes</h2>
+      </div>
+      <div class="faq-grid">
+        <div class="faq-item">
+          <div class="faq-q">Quanto custa uma landing page?<div class="faq-chev">▾</div>
+          </div>
+          <div class="faq-a">Valores variam conforme complexidade. Landing pages partem de R$600. Solicite um orçamento
+            gratuito para um valor específico.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Qual o prazo de entrega?<div class="faq-chev">▾</div>
+          </div>
+          <div class="faq-a">Landing pages: 5 a 10 dias. Sites: 15 a 25 dias. Sistemas: 30 a 60 dias. Apps: 45 a 90
+            dias.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Preciso saber programar para usar?<div class="faq-chev">▾</div>
+          </div>
+          <div class="faq-a">Não. Painel administrativo intuitivo entregue com treinamento e documentação completos.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">E se precisar de ajustes depois?<div class="faq-chev">▾</div>
+          </div>
+          <div class="faq-a">30 dias de suporte gratuito inclusos. Após isso, planos mensais de manutenção para
+            melhorias contínuas.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Atende fora de São Paulo?<div class="faq-chev">▾</div>
+          </div>
+          <div class="faq-a">Sim! Atendo todo o Brasil 100% remoto. Reuniões, aprovações e entregas totalmente online.
+          </div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">O site fica hospedado onde?<div class="faq-chev">▾</div>
+          </div>
+          <div class="faq-a">Vercel (frontend) e Neon PostgreSQL (banco) — ambos gratuitos. Auxílio completo com domínio
+            no Registro.br.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta">
+    <canvas class="sec-canvas" id="canvas-cta"></canvas>
+    <div class="cta-inner container">
+      <div id="ctaBlock">
+        <div class="cta-badge">🚀 Comece hoje</div>
+        <div class="cta-h">Seu negócio merece<br>tecnologia de <em>verdade.</em></div>
+        <div class="cta-sub">Orçamento gratuito e sem compromisso. Fale agora e receba uma proposta personalizada.</div>
+        <div class="cta-btns">
+          <a href="https://wa.me/5511900000000" class="btn-main" target="_blank"><svg width="16" height="16"
+              viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+            </svg>Falar no WhatsApp agora</a>
+          <a href="#contato" class="btn-sec">Preencher formulário →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="foot-grid">
+        <div>
+          <div class="foot-logo">DN<div class="logo-dot" style="margin-bottom:5px;margin-left:2px"></div>Teacher</div>
+          <div class="foot-tagline">Tecnologia acessível para pequenos negócios crescerem no mundo digital.</div>
+        </div>
+        <div class="foot-col">
+          <div class="foot-col-title">Serviços</div>
+          <ul>
+            <li><a href="#servicos">Landing Pages</a></li>
+            <li><a href="#servicos">Sistemas Web</a></li>
+            <li><a href="#servicos">Apps Mobile</a></li>
+            <li><a href="#servicos">Automação WhatsApp</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <div class="foot-col-title">Empresa</div>
+          <ul>
+            <li><a href="#why">Sobre</a></li>
+            <li><a href="#processo">Como funciona</a></li>
+            <li><a href="#projetos">Projetos</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="foot-col">
+          <div class="foot-col-title">Contato</div>
+          <ul>
+            <li><a href="https://wa.me/5511900000000" target="_blank">WhatsApp</a></li>
+            <li><a href="mailto:davi@dnteacher.dev">Email</a></li>
+            <li><a href="https://linkedin.com" target="_blank">LinkedIn</a></li>
+            <li><a href="https://github.com" target="_blank">GitHub</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <div class="foot-copy">© 2025 DN Teacher · Davi Nascimento</div>
+        <div class="foot-socials"><a href="https://linkedin.com" target="_blank">in</a><a href="https://github.com"
+            target="_blank">gh</a><a href="https://instagram.com" target="_blank">ig</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    /* ════════════════════════════════════════════════════════
+       A — THREE.JS 3D NEURAL NETWORK (scroll-reactive)
+    ════════════════════════════════════════════════════════ */
+    (function () {
+      const cv = document.getElementById('three-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setClearColor(0, 0);
+
+      const scene = new THREE.Scene();
+      const FOV = 78;
+      const camera = new THREE.PerspectiveCamera(FOV, innerWidth / innerHeight, 1, 1400);
+      camera.position.set(0, 0, 0);
+
+      const N = 280, HUB_N = 10, Z_NEAR = 8, Z_FAR = 950;
+      const HALF_FOV = (FOV * Math.PI / 180) / 2;
+      const MAX_LINES = 700, FLOW_N = 14;
+      const MODES = {
+        hero: { zm: 1.0, sw: 0.0, lo: .11 }, why: { zm: .35, sw: .30, lo: .15 },
+        servicos: { zm: .55, sw: .40, lo: .09 }, nichos: { zm: .12, sw: .85, lo: .20 },
+        processo: { zm: 1.1, sw: .04, lo: .07 }, projetos: { zm: .45, sw: .20, lo: .12 },
+        contato: { zm: .22, sw: .55, lo: .17 }, faq: { zm: .38, sw: .15, lo: .11 },
+        cta: { zm: 2.6, sw: 0.0, lo: .04 }
+      };
+      let czm = 1, csw = 0, clo = .11, tzm = 1, tsw = 0, tlo = .11;
+
+      const pos = new Float32Array(N * 3), vel = new Float32Array(N * 3);
+      const baseVZ = new Float32Array(N), aSz = new Float32Array(N), aCl = new Float32Array(N * 3);
+      const pPh = new Float32Array(N), pSp = new Float32Array(N), isHub = new Uint8Array(N);
+
+      function spawnAt(i, z) {
+        const d = Math.abs(z), asp = innerWidth / innerHeight;
+        const hw = d * Math.tan(HALF_FOV) * 1.35, hh = hw / asp;
+        pos[i * 3] = (Math.random() - .5) * 2 * hw;
+        pos[i * 3 + 1] = (Math.random() - .5) * 2 * hh;
+        pos[i * 3 + 2] = z;
+        baseVZ[i] = (isHub[i] ? .09 : .2) + Math.random() * (isHub[i] ? .12 : .38);
+        vel[i * 3] = (Math.random() - .5) * .05; vel[i * 3 + 1] = (Math.random() - .5) * .05;
+      }
+      for (let i = 0; i < N; i++) {
+        isHub[i] = i < HUB_N ? 1 : 0; pPh[i] = Math.random() * Math.PI * 2; pSp[i] = .01 + Math.random() * .022;
+        if (isHub[i]) { aSz[i] = 7 + Math.random() * 5; aCl[i * 3] = .08; aCl[i * 3 + 1] = .75; aCl[i * 3 + 2] = 1 }
+        else { aSz[i] = 1.8 + Math.random() * 2.8; aCl[i * 3] = .03 + Math.random() * .09; aCl[i * 3 + 1] = .44 + Math.random() * .28; aCl[i * 3 + 2] = .88 + Math.random() * .12 }
+        spawnAt(i, -(Z_NEAR + Math.random() * (Z_FAR - Z_NEAR)));
+      }
+
+      const ptGeo = new THREE.BufferGeometry();
+      const pA = new THREE.BufferAttribute(pos, 3); pA.setUsage(THREE.DynamicDrawUsage);
+      const sA = new THREE.BufferAttribute(aSz, 1); sA.setUsage(THREE.DynamicDrawUsage);
+      const cA = new THREE.BufferAttribute(aCl, 3); cA.setUsage(THREE.DynamicDrawUsage);
+      ptGeo.setAttribute('position', pA); ptGeo.setAttribute('aSize', sA); ptGeo.setAttribute('aColor', cA);
+      const ptMat = new THREE.ShaderMaterial({
+        uniforms: {},
+        vertexShader: `attribute float aSize;attribute vec3 aColor;varying vec3 vC;varying float vO;
+    void main(){vC=aColor;vec4 mv=modelViewMatrix*vec4(position,1.0);float d=-mv.z;
+    vO=clamp(1.8-d/800.0,0.05,1.0);gl_PointSize=aSize*(280.0/max(d,1.0));
+    gl_PointSize=clamp(gl_PointSize,1.0,40.0);gl_Position=projectionMatrix*mv;}`,
+        fragmentShader: `varying vec3 vC;varying float vO;
+    void main(){vec2 u=gl_PointCoord-vec2(0.5);float d=length(u);if(d>.5)discard;
+    float g=pow(1.0-d*2.0,1.5);float h=pow(max(0.0,1.0-d*1.4),0.4)*0.3;
+    gl_FragColor=vec4(vC,(g+h)*vO);}`,
+        transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+      });
+      scene.add(new THREE.Points(ptGeo, ptMat));
+
+      const lBuf = new Float32Array(MAX_LINES * 6), lGeo = new THREE.BufferGeometry();
+      const lPA = new THREE.BufferAttribute(lBuf, 3); lPA.setUsage(THREE.DynamicDrawUsage);
+      lGeo.setAttribute('position', lPA);
+      const lMat = new THREE.LineBasicMaterial({ color: 0x0ea5ff, transparent: true, opacity: .11, blending: THREE.AdditiveBlending, depthWrite: false });
+      scene.add(new THREE.LineSegments(lGeo, lMat));
+
+      const fBuf = new Float32Array(FLOW_N * 3), fGeo = new THREE.BufferGeometry();
+      const fPA = new THREE.BufferAttribute(fBuf, 3); fPA.setUsage(THREE.DynamicDrawUsage);
+      fGeo.setAttribute('position', fPA);
+      const fMat = new THREE.ShaderMaterial({
+        uniforms: {},
+        vertexShader: `void main(){vec4 mv=modelViewMatrix*vec4(position,1.0);gl_PointSize=5.5*(280.0/max(-mv.z,1.0));gl_PointSize=clamp(gl_PointSize,2.0,18.0);gl_Position=projectionMatrix*mv;}`,
+        fragmentShader: `void main(){vec2 u=gl_PointCoord-.5;float d=length(u);if(d>.5)discard;gl_FragColor=vec4(0.6,0.92,1.0,pow(1.0-d*2.0,2.2)*.95);}`,
+        transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+      });
+      scene.add(new THREE.Points(fGeo, fMat));
+
+      let aEdges = [];
+      const flows = Array.from({ length: FLOW_N }, () => ({ a: Math.floor(Math.random() * N), b: Math.floor(Math.random() * N), t: Math.random(), spd: .005 + Math.random() * .009 }));
+      let tRX = 0, tRY = 0, cRX = 0, cRY = 0;
+
+      window.addEventListener('mousemove', e => { tRX = -((e.clientY / innerHeight) * 2 - 1) * .14; tRY = -((e.clientX / innerWidth) * 2 - 1) * .18 });
+      window.addEventListener('mouseleave', () => { tRX = 0; tRY = 0 });
+      window.addEventListener('resize', () => { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix() });
+
+      // Scroll section detection
+      const secObs = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { const m = MODES[e.target.id] || MODES.hero; tzm = m.zm; tsw = m.sw; tlo = m.lo } });
+      }, { threshold: .3 });
+      ['hero', 'why', 'servicos', 'nichos', 'processo', 'projetos', 'contato', 'faq', 'cta'].forEach(id => { const el = document.getElementById(id); if (el) secObs.observe(el) });
+
+      function animate() {
+        requestAnimationFrame(animate);
+        czm += (tzm - czm) * .018; csw += (tsw - csw) * .018; clo += (tlo - clo) * .018;
+        lMat.opacity = clo;
+        for (let i = 0; i < N; i++) {
+          pos[i * 3 + 2] += baseVZ[i] * czm;
+          const px = pos[i * 3], py = pos[i * 3 + 1], r2 = Math.sqrt(px * px + py * py) || 1;
+          pos[i * 3] += vel[i * 3] + (-py / r2) * csw * .5;
+          pos[i * 3 + 1] += vel[i * 3 + 1] + (px / r2) * csw * .5;
+          if (pos[i * 3 + 2] > -5) spawnAt(i, -(Z_FAR * .55 + Math.random() * Z_FAR * .45));
+          pPh[i] += pSp[i]; const p = .5 + .5 * Math.sin(pPh[i]);
+          if (isHub[i]) { aSz[i] = (7 + Math.random() * 5) * (.6 + p * .75); aCl[i * 3 + 1] = .6 + p * .32 }
+          else aSz[i] = (1.8 + Math.random() * 2.8) * (.82 + p * .28);
+        }
+        pA.needsUpdate = true; sA.needsUpdate = true; cA.needsUpdate = true;
+        let lc = 0; aEdges = [];
+        outer: for (let i = 0; i < N; i++) {
+          const rng = isHub[i] ? 230 : 140;
+          for (let j = i + 1; j < N; j++) {
+            const dx = pos[i * 3] - pos[j * 3], dy = pos[i * 3 + 1] - pos[j * 3 + 1], dz = pos[i * 3 + 2] - pos[j * 3 + 2];
+            if (Math.sqrt(dx * dx + dy * dy + dz * dz) < (isHub[j] ? 230 : rng)) {
+              const o = lc * 6; lBuf[o] = pos[i * 3]; lBuf[o + 1] = pos[i * 3 + 1]; lBuf[o + 2] = pos[i * 3 + 2];
+              lBuf[o + 3] = pos[j * 3]; lBuf[o + 4] = pos[j * 3 + 1]; lBuf[o + 5] = pos[j * 3 + 2];
+              aEdges.push([i, j]); if (++lc >= MAX_LINES) break outer;
+            }
+          }
+        }
+        lPA.needsUpdate = true; lGeo.setDrawRange(0, lc * 2);
+        flows.forEach(fl => {
+          fl.t += fl.spd; if (fl.t >= 1) { if (aEdges.length > 0) { const e = aEdges[Math.floor(Math.random() * aEdges.length)]; fl.a = e[0]; fl.b = e[1]; if (Math.random() > .5) [fl.a, fl.b] = [fl.b, fl.a] } fl.t = 0; fl.spd = .005 + Math.random() * .009 }
+          const t = fl.t, et = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t, ai = fl.a * 3, bi = fl.b * 3;
+          fBuf[fl.a * 3] = pos[ai] + (pos[bi] - pos[ai]) * et;  // reuse index
+          fBuf[fl.a * 3 + 1] = pos[ai + 1] + (pos[bi + 1] - pos[ai + 1]) * et;
+          fBuf[fl.a * 3 + 2] = pos[ai + 2] + (pos[bi + 2] - pos[ai + 2]) * et;
+          // Actually store in flow buffer properly
+        });
+        // Fix flow buffer
+        flows.forEach((fl, f) => {
+          const t = fl.t, et = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t, ai = fl.a * 3, bi = fl.b * 3;
+          fBuf[f * 3] = pos[ai] + (pos[bi] - pos[ai]) * et;
+          fBuf[f * 3 + 1] = pos[ai + 1] + (pos[bi + 1] - pos[ai + 1]) * et;
+          fBuf[f * 3 + 2] = pos[ai + 2] + (pos[bi + 2] - pos[ai + 2]) * et;
+        });
+        fPA.needsUpdate = true;
+        cRX += (tRX - cRX) * .045; cRY += (tRY - cRY) * .045;
+        camera.rotation.order = 'YXZ'; camera.rotation.x = cRX; camera.rotation.y = cRY;
+        renderer.render(scene, camera);
+      }
+      setTimeout(() => document.getElementById('three-canvas').classList.add('ready'), 2200);
+      animate();
+    })();
+
+    /* ════════════════════════════════════════════════════════
+       B — GSAP CINEMATIC INTRO SEQUENCE
+       Phases:
+       1. Intro screen: logo + line + sub animate in (0-1.8s)
+       2. Intro holds briefly (1.8-2.4s)
+       3. Intro fades out (2.4-3.2s)
+       4. Nav reveals (3.0s)
+       5. Hero badge + h1 words flip in 3D (3.2-5.0s)
+       6. Sub + buttons + stats + terminal (5.0-6.5s)
+    ════════════════════════════════════════════════════════ */
+    (function () {
+      // Hide everything initially
+      gsap.set('#intro-logo', { autoAlpha: 0, scale: 0.85, y: 20 });
+      gsap.set('#intro-line', { autoAlpha: 0, scaleX: 0, transformOrigin: 'left center' });
+      gsap.set('#intro-sub', { autoAlpha: 0, y: 10 });
+      gsap.set('nav', { autoAlpha: 0, y: -20 });
+      gsap.set('.nav-links li', { autoAlpha: 0, y: -12 });
+      gsap.set('#navCta', { autoAlpha: 0, x: 16 });
+      gsap.set('#heroBadge', { autoAlpha: 0, y: 20, rotateX: -30, transformPerspective: 600 });
+      gsap.set('.h1-word', { autoAlpha: 0, y: 80, rotateX: -90, transformOrigin: '50% 100%', transformPerspective: 500 });
+      gsap.set('#heroSub', { autoAlpha: 0, y: 36 });
+      gsap.set('#btn1', { autoAlpha: 0, y: 24, scale: .96 });
+      gsap.set('#btn2', { autoAlpha: 0, y: 24, scale: .96 });
+      gsap.set('#heroStats', { autoAlpha: 0, y: 20 });
+      gsap.set('#heroRight', { autoAlpha: 0, x: 80, rotateY: 18, transformPerspective: 900 });
+      gsap.set('#ticker', { autoAlpha: 0 });
+
+      const master = gsap.timeline();
+
+      // ── PHASE 1: INTRO SCREEN ──
+      master
+        .to('#intro-logo', { autoAlpha: 1, scale: 1, y: 0, duration: 1.0, ease: 'expo.out' })
+        .to('#intro-line', { autoAlpha: 1, scaleX: 1, duration: 0.8, ease: 'power3.inOut' }, '-=0.3')
+        .to('#intro-sub', { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3')
+        // ── PHASE 2: HOLD ──
+        .to({}, { duration: 0.7 })
+        // ── PHASE 3: INTRO OUT ──
+        .to(['#intro-logo', '#intro-line', '#intro-sub'], { autoAlpha: 0, y: -20, duration: 0.5, stagger: .08, ease: 'power2.in' })
+        .to('#intro', { autoAlpha: 0, duration: 0.5, ease: 'power2.inOut' }, '-=0.2')
+        .set('#intro', { display: 'none' })
+
+        // ── PHASE 4: NAV REVEALS ──
+        .to('nav', { autoAlpha: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.2')
+        .to('.nav-links li', { autoAlpha: 1, y: 0, duration: 0.5, stagger: .07, ease: 'power2.out' }, '-=0.4')
+        .to('#navCta', { autoAlpha: 1, x: 0, duration: 0.6, ease: 'back.out(1.4)' }, '-=0.3')
+
+        // ── PHASE 5: HERO TEXT — 3D CINEMATIC ──
+        // Badge flips up
+        .to('#heroBadge', { autoAlpha: 1, y: 0, rotateX: 0, duration: 1.1, ease: 'expo.out' }, '-=0.1')
+        // H1 words: each word rotates up from the floor (3D rotateX)
+        .to('#hw0', { autoAlpha: 1, y: 0, rotateX: 0, duration: 1.5, ease: 'expo.out' }, '+=0.05')
+        .to('#hw1', { autoAlpha: 1, y: 0, rotateX: 0, duration: 1.5, ease: 'expo.out' }, '-=1.1')
+        .to('#hw2', { autoAlpha: 1, y: 0, rotateX: 0, duration: 1.5, ease: 'expo.out' }, '-=1.0')
+        .to('#hw3', { autoAlpha: 1, y: 0, rotateX: 0, duration: 1.5, ease: 'expo.out' }, '-=1.0')
+
+        // Terminal slides in with 3D rotateY (parallel with words)
+        .to('#heroRight', { autoAlpha: 1, x: 0, rotateY: 0, duration: 1.8, ease: 'expo.out' }, '-=2.0')
+
+        // ── PHASE 6: SUPPORTING ELEMENTS ──
+        .to('#heroSub', { autoAlpha: 1, y: 0, duration: 1.0, ease: 'power3.out' }, '-=0.8')
+        .to('#btn1', { autoAlpha: 1, y: 0, scale: 1, duration: 0.8, ease: 'back.out(1.5)' }, '-=0.5')
+        .to('#btn2', { autoAlpha: 1, y: 0, scale: 1, duration: 0.8, ease: 'back.out(1.5)' }, '-=0.65')
+        .to('#heroStats', { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.5')
+        .to('#ticker', { autoAlpha: 1, duration: 0.8, ease: 'power2.out' }, '-=0.3');
+
+      // Counter animation triggered by stats appearing
+      master.add(() => {
+        document.querySelectorAll('[data-count]').forEach(el => {
+          const tg = +el.dataset.count, sf = el.dataset.suf || '';
+          const dur = 2000, t0 = performance.now();
+          const step = now => {
+            const p = Math.min((now - t0) / dur, 1), e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+            el.textContent = Math.round(e * tg) + sf;
+            if (p < 1) requestAnimationFrame(step);
+          }; requestAnimationFrame(step);
+        });
+      }, '-=0.4');
+    })();
+
+    /* ════════════════════════════════════════════════════════
+       C — GSAP SCROLL TRIGGER — 3D Section Reveals
+       Each section has a unique 3D entrance animation
+    ════════════════════════════════════════════════════════ */
+    (function () {
+      // ── WHY ──
+      ScrollTrigger.create({
+        trigger: '#why', start: 'top 65%', once: true, onEnter: () => {
+          gsap.from('#whyHead', { y: 50, autoAlpha: 0, rotateX: -20, transformPerspective: 600, duration: 1.0, ease: 'expo.out' });
+          gsap.from('.why-item', {
+            y: 70, autoAlpha: 0, rotateX: -25, transformPerspective: 800,
+            stagger: { amount: .4, from: 'start' }, duration: 1.1, ease: 'expo.out', delay: .3
+          });
+        }
+      });
+
+      // ── SERVICES ── bento cards fan in with alternating rotateY
+      ScrollTrigger.create({
+        trigger: '#servicos', start: 'top 65%', once: true, onEnter: () => {
+          gsap.from('#servHead', { y: 50, autoAlpha: 0, rotateX: -20, transformPerspective: 600, duration: 1.0, ease: 'expo.out' });
+          gsap.from('.b', {
+            y: 80, autoAlpha: 0,
+            rotateY: (i) => i % 2 === 0 ? -12 : 12,
+            rotateX: -15,
+            transformPerspective: 1000,
+            scale: .94,
+            stagger: { amount: .6, from: 'start' },
+            duration: 1.2, ease: 'expo.out', delay: .3
+          });
+        }
+      });
+
+      // ── NICHOS ── cards flip in from the side
+      ScrollTrigger.create({
+        trigger: '#nichos', start: 'top 65%', once: true, onEnter: () => {
+          gsap.from(['#nichosHead', '#nichosDores'], {
+            y: 50, autoAlpha: 0, rotateX: -20,
+            transformPerspective: 600, duration: 1.0, ease: 'expo.out', stagger: .15
+          });
+          gsap.from('.nicho-card', {
+            x: -50, autoAlpha: 0,
+            rotateY: -50,
+            transformPerspective: 800,
+            stagger: { amount: .5, from: 'start' },
+            duration: 1.3, ease: 'expo.out', delay: .4
+          });
+        }
+      });
+
+      // ── PROCESS ── steps scale up from below with bounce
+      ScrollTrigger.create({
+        trigger: '#processo', start: 'top 65%', once: true, onEnter: () => {
+          gsap.from('#procHead', { y: 50, autoAlpha: 0, rotateX: -20, transformPerspective: 600, duration: 1.0, ease: 'expo.out' });
+          gsap.from('.step', {
+            y: 90, autoAlpha: 0, scale: .85,
+            rotateX: -20,
+            transformPerspective: 900,
+            stagger: { amount: .4, from: 'start' },
+            duration: 1.2, ease: 'back.out(1.3)', delay: .3
+          });
+        }
+      });
+
+      // ── PORTFOLIO ── cards split: left from left, right from right
+      ScrollTrigger.create({
+        trigger: '#projetos', start: 'top 65%', once: true, onEnter: () => {
+          gsap.from('#portHead', { y: 50, autoAlpha: 0, rotateX: -20, transformPerspective: 600, duration: 1.0, ease: 'expo.out' });
+          const cards = gsap.utils.toArray('.port-card');
+          cards.forEach((card, i) => {
+            gsap.from(card, {
+              x: i % 2 === 0 ? -80 : 80,
+              autoAlpha: 0,
+              rotateY: i % 2 === 0 ? 18 : -18,
+              transformPerspective: 1000,
+              duration: 1.3, ease: 'expo.out', delay: .3 + i * .12
+            });
+          });
+        }
+      });
+
+      // ── CONTACT ── left vs right: book opening effect
+      ScrollTrigger.create({
+        trigger: '#contato', start: 'top 65%', once: true, onEnter: () => {
+          gsap.from('#contactHead', { y: 50, autoAlpha: 0, rotateX: -20, transformPerspective: 600, duration: 1.0, ease: 'expo.out' });
+          gsap.from('.cf', {
+            x: -60, autoAlpha: 0, rotateY: 20, transformPerspective: 700,
+            stagger: { amount: .35 }, duration: 1.1, ease: 'expo.out', delay: .3
+          });
+          gsap.from('#formCard', {
+            x: 80, autoAlpha: 0, rotateY: -22, transformPerspective: 1000,
+            scale: .96, duration: 1.4, ease: 'expo.out', delay: .2
+          });
+        }
+      });
+
+      // ── FAQ ── stagger from bottom with 3D tilt
+      ScrollTrigger.create({
+        trigger: '#faq', start: 'top 65%', once: true, onEnter: () => {
+          gsap.from('#faqHead', { y: 50, autoAlpha: 0, rotateX: -20, transformPerspective: 600, duration: 1.0, ease: 'expo.out' });
+          gsap.from('.faq-item', {
+            y: 50, autoAlpha: 0, rotateX: -18, transformPerspective: 800,
+            stagger: { amount: .4 }, duration: 1.0, ease: 'expo.out', delay: .3
+          });
+        }
+      });
+
+      // ── CTA ── dramatic scale + rotation
+      ScrollTrigger.create({
+        trigger: '#cta', start: 'top 65%', once: true, onEnter: () => {
+          const tl = gsap.timeline();
+          tl.from('.cta-badge', { y: 30, autoAlpha: 0, scale: .9, duration: .8, ease: 'back.out(1.6)' })
+            .from('.cta-h', {
+              y: 60, autoAlpha: 0, rotateX: -25, transformPerspective: 700,
+              scale: .92, duration: 1.4, ease: 'expo.out'
+            }, '-=.3')
+            .from('.cta-sub', { y: 30, autoAlpha: 0, duration: 1.0, ease: 'expo.out' }, '-=.7')
+            .from('.cta-btns > *', {
+              y: 25, autoAlpha: 0, scale: .9, stagger: .15,
+              duration: .9, ease: 'back.out(1.5)'
+            }, '-=.5');
+        }
+      });
+    })();
+
+    /* ════════════════════════════════════════════════════════
+       D — NICHOS ORBITAL CANVAS (5 clusters — PRIMARY)
+    ════════════════════════════════════════════════════════ */
+    (function () {
+      const cv = document.getElementById('canvas-nichos');
+      const sec = document.getElementById('nichos');
+      const ctx = cv.getContext('2d');
+      let W, H, raf, active = false, time = 0, hoveredNode = -1;
+
+      const SYSTEMS = [
+        { rings: [{ r: 34, n: 5, spd: .012, sz: 2.2, dir: 1 }, { r: 66, n: 8, spd: .006, sz: 1.6, dir: -1 }], phase: 0 },
+        { rings: [{ r: 36, n: 6, spd: .010, sz: 2.4, dir: 1 }, { r: 72, n: 9, spd: .005, sz: 1.7, dir: -1 }, { r: 108, n: 4, spd: .003, sz: 1.3, dir: 1 }], phase: 1.2 },
+        { rings: [{ r: 40, n: 5, spd: .007, sz: 2.6, dir: 1 }, { r: 80, n: 10, spd: .004, sz: 1.8, dir: -1 }, { r: 124, n: 6, spd: .002, sz: 1.4, dir: 1 }], phase: 2.4 },
+        { rings: [{ r: 34, n: 4, spd: .011, sz: 2.2, dir: -1 }, { r: 68, n: 7, spd: .006, sz: 1.6, dir: 1 }], phase: 3.6 },
+        { rings: [{ r: 30, n: 3, spd: .014, sz: 2.0, dir: 1 }, { r: 58, n: 5, spd: .008, sz: 1.5, dir: -1 }], phase: 4.8 }
+      ];
+
+      function resize() { W = sec.offsetWidth; H = sec.offsetHeight; cv.width = W; cv.height = H }
+      function getPos(i) { return { x: W * [.1, .3, .5, .7, .9][i], y: H * .77 } }
+
+      function drawSystem(sys, cx, cy, idx) {
+        const hov = hoveredNode === idx, s = hov ? 1.3 : 1, op = hov ? .9 : .55;
+        const maxR = (sys.rings[sys.rings.length - 1].r + 30) * s;
+        const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR);
+        grd.addColorStop(0, `rgba(14,165,255,${hov ? .1 : .04})`); grd.addColorStop(1, 'rgba(14,165,255,0)');
+        ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(cx, cy, maxR, 0, Math.PI * 2); ctx.fill();
+        sys.rings.forEach(r => {
+          ctx.beginPath(); ctx.arc(cx, cy, r.r * s, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(14,165,255,${hov ? .08 : .03})`; ctx.lineWidth = .8; ctx.stroke();
+        });
+        const ng = ctx.createRadialGradient(cx, cy, 0, cx, cy, 22 * s);
+        ng.addColorStop(0, `rgba(14,165,255,${hov ? 1 : .8})`); ng.addColorStop(.4, `rgba(14,165,255,${hov ? .4 : .2})`); ng.addColorStop(1, 'rgba(14,165,255,0)');
+        ctx.fillStyle = ng; ctx.beginPath(); ctx.arc(cx, cy, 22 * s, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = `rgba(14,165,255,${hov ? 1 : .85})`; ctx.beginPath(); ctx.arc(cx, cy, hov ? 10 : 7, 0, Math.PI * 2); ctx.fill();
+        sys.rings.forEach(ring => {
+          for (let i = 0; i < ring.n; i++) {
+            const ang = time * ring.spd * ring.dir * 60 + (Math.PI * 2 / ring.n) * i + sys.phase;
+            const px = cx + Math.cos(ang) * ring.r * s, py = cy + Math.sin(ang) * ring.r * s;
+            for (let t2 = 1; t2 <= 5; t2++) {
+              const ta = ang - ring.dir * (t2 * .05), tx = cx + Math.cos(ta) * ring.r * s, ty = cy + Math.sin(ta) * ring.r * s;
+              ctx.beginPath(); ctx.arc(tx, ty, ring.sz * s * (1 - t2 * .15), 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(14,165,255,${op * (1 - t2 * .18)})`; ctx.fill();
+            }
+            ctx.beginPath(); ctx.arc(px, py, ring.sz * s, 0, Math.PI * 2); ctx.fillStyle = `rgba(14,165,255,${op})`; ctx.fill();
+            const pg = ctx.createRadialGradient(px, py, 0, px, py, ring.sz * s * 4);
+            pg.addColorStop(0, `rgba(14,165,255,${op * .35})`); pg.addColorStop(1, 'rgba(14,165,255,0)');
+            ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(px, py, ring.sz * s * 4, 0, Math.PI * 2); ctx.fill();
+          }
+        });
+      }
+
+      const pulses = [{ i: 0, j: 1, t: 0, spd: .003 }, { i: 1, j: 2, t: .33, spd: .0025 }, { i: 2, j: 3, t: .66, spd: .003 }, { i: 3, j: 4, t: .15, spd: .0028 }];
+
+      function draw() {
+        if (!active) { raf = null; return }
+        raf = requestAnimationFrame(draw);
+        time += 1 / 60; ctx.clearRect(0, 0, W, H);
+        const positions = SYSTEMS.map((_, i) => getPos(i));
+        for (let i = 0; i < 4; i++) {
+          const a = positions[i], b = positions[i + 1];
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = 'rgba(14,165,255,.07)'; ctx.lineWidth = 1; ctx.stroke();
+        }
+        pulses.forEach(p => {
+          p.t = (p.t + p.spd) % 1;
+          const a = positions[p.i], b = positions[p.j];
+          const et = p.t < .5 ? 2 * p.t * p.t : -1 + (4 - 2 * p.t) * p.t;
+          const px = a.x + (b.x - a.x) * et, py = a.y + (b.y - a.y) * et;
+          const pg = ctx.createRadialGradient(px, py, 0, px, py, 8);
+          pg.addColorStop(0, 'rgba(14,165,255,.9)'); pg.addColorStop(1, 'rgba(14,165,255,0)');
+          ctx.fillStyle = pg; ctx.beginPath(); ctx.arc(px, py, 8, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = 'rgba(14,165,255,.95)'; ctx.beginPath(); ctx.arc(px, py, 3, 0, Math.PI * 2); ctx.fill();
+        });
+        SYSTEMS.forEach((sys, i) => { const { x, y } = positions[i]; drawSystem(sys, x, y, i) });
+      }
+
+      function start() { if (active) return; resize(); active = true; cv.classList.add('active'); draw() }
+      function stop() { active = false; cv.classList.remove('active'); if (raf) { cancelAnimationFrame(raf); raf = null } }
+      new IntersectionObserver(e => e[0].isIntersecting ? start() : stop(), { threshold: .1 }).observe(sec);
+      window.addEventListener('resize', () => { if (active) resize() });
+      document.querySelectorAll('.nicho-card[data-node]').forEach(card => {
+        const idx = +card.dataset.node;
+        card.addEventListener('mouseenter', () => hoveredNode = idx);
+        card.addEventListener('mouseleave', () => hoveredNode = -1);
+      });
+    })();
+
+    /* ════════════════════════════════════════════════════════
+       E — SERVICES HEX CIRCUIT CANVAS
+    ════════════════════════════════════════════════════════ */
+    (function () {
+      const cv = document.getElementById('canvas-servicos');
+      const sec = document.getElementById('servicos');
+      const ctx = cv.getContext('2d');
+      let W, H, raf, active = false, time = 0, nodes = [], traces = [];
+      const HEX = 70, H3 = HEX * Math.sqrt(3);
+
+      function buildGrid() {
+        nodes = [];
+        for (let col = -1; col < Math.ceil(W / (HEX * 1.5)) + 2; col++)
+          for (let row = -1; row < Math.ceil(H / H3) + 2; row++)
+            nodes.push({ x: col * HEX * 1.5, y: row * H3 + (col % 2) * H3 / 2, ph: Math.random() * Math.PI * 2, spd: .008 + Math.random() * .006 });
+      }
+      function spawnTrace() {
+        if (nodes.length < 2) { return }
+        const a = Math.floor(Math.random() * nodes.length), b = Math.floor(Math.random() * nodes.length);
+        if (a !== b) traces.push({ ax: nodes[a].x, ay: nodes[a].y, bx: nodes[b].x, by: nodes[b].y, t: 0, spd: .004 + Math.random() * .004 });
+      }
+      function resize() { W = sec.offsetWidth; H = sec.offsetHeight; cv.width = W; cv.height = H; buildGrid(); traces = []; for (let i = 0; i < 8; i++)spawnTrace() }
+
+      function draw() {
+        if (!active) { raf = null; return }
+        raf = requestAnimationFrame(draw); time += 1 / 60; ctx.clearRect(0, 0, W, H);
+        nodes.forEach(n => {
+          const p = .5 + .5 * Math.sin(time * n.spd * 60 + n.ph);
+          ctx.beginPath(); ctx.arc(n.x, n.y, 1.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(14,165,255,${.04 + p * .08})`; ctx.fill();
+        });
+        traces = traces.filter(tr => {
+          tr.t += tr.spd; if (tr.t > 1.3) { spawnTrace(); return false }
+          const et = Math.min(tr.t < .5 ? 2 * tr.t * tr.t : -1 + (4 - 2 * tr.t) * tr.t, .99);
+          const ex = tr.ax + (tr.bx - tr.ax) * et, ey = tr.ay + (tr.by - tr.ay) * et;
+          ctx.beginPath(); ctx.moveTo(tr.ax, tr.ay); ctx.lineTo(ex, ey);
+          ctx.strokeStyle = 'rgba(14,165,255,.18)'; ctx.lineWidth = 1.2; ctx.stroke();
+          ctx.beginPath(); ctx.arc(ex, ey, 3, 0, Math.PI * 2); ctx.fillStyle = 'rgba(14,165,255,.7)'; ctx.fill();
+          return true;
+        });
+      }
+
+      function start() { if (active) return; resize(); active = true; cv.classList.add('active'); draw() }
+      function stop() { active = false; cv.classList.remove('active'); if (raf) { cancelAnimationFrame(raf); raf = null } }
+      new IntersectionObserver(e => e[0].isIntersecting ? start() : stop(), { threshold: .1 }).observe(sec);
+      window.addEventListener('resize', () => { if (active) resize() });
+    })();
+
+    /* ════════════════════════════════════════════════════════
+       F — CONTACT RADAR CANVAS
+    ════════════════════════════════════════════════════════ */
+    (function () {
+      const cv = document.getElementById('canvas-contato');
+      const sec = document.getElementById('contato');
+      const ctx = cv.getContext('2d');
+      let W, H, raf, active = false, angle = 0, dots = [];
+
+      function resize() { W = sec.offsetWidth; H = sec.offsetHeight; cv.width = W; cv.height = H }
+
+      function draw() {
+        if (!active) { raf = null; return }
+        raf = requestAnimationFrame(draw); angle += .008; ctx.clearRect(0, 0, W, H);
+        const cx = W * .25, cy = H * .5, maxR = Math.min(W * .35, H * .7);
+        for (let i = 1; i <= 5; i++) {
+          ctx.beginPath(); ctx.arc(cx, cy, maxR * (i / 5), 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(14,165,255,${.04 + i * .01})`; ctx.lineWidth = .8; ctx.stroke();
+        }
+        ctx.save();
+        for (let i = 0; i < 40; i++) {
+          const a = angle - Math.PI * .6 * (i / 40);
+          ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, maxR, a, a + Math.PI * .6 / 40); ctx.closePath();
+          ctx.fillStyle = `rgba(14,165,255,${(1 - i / 40) * .12})`; ctx.fill();
+        }
+        ctx.restore();
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(angle) * maxR, cy + Math.sin(angle) * maxR);
+        ctx.strokeStyle = 'rgba(14,165,255,.55)'; ctx.lineWidth = 1.5; ctx.stroke();
+        if (Math.sin(angle * 3) > .96 && dots.length < 20)
+          dots.push({ x: cx + Math.cos(angle) * (maxR * .2 + Math.random() * maxR * .7), y: cy + Math.sin(angle) * (maxR * .2 + Math.random() * maxR * .7), life: 1, spd: .008 + Math.random() * .006 });
+        dots = dots.filter(d => {
+          d.life -= d.spd; if (d.life <= 0) return false;
+          const r = 6 * (1 - d.life) + 2;
+          ctx.beginPath(); ctx.arc(d.x, d.y, r, 0, Math.PI * 2); ctx.strokeStyle = `rgba(14,165,255,${d.life * .8})`; ctx.lineWidth = 1; ctx.stroke();
+          ctx.beginPath(); ctx.arc(d.x, d.y, 2, 0, Math.PI * 2); ctx.fillStyle = `rgba(14,165,255,${d.life})`; ctx.fill();
+          return true;
+        });
+        const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 20);
+        cg.addColorStop(0, 'rgba(14,165,255,.6)'); cg.addColorStop(1, 'rgba(14,165,255,0)');
+        ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(14,165,255,.9)'; ctx.beginPath(); ctx.arc(cx, cy, 4, 0, Math.PI * 2); ctx.fill();
+      }
+
+      function start() { if (active) return; resize(); active = true; cv.classList.add('active'); draw() }
+      function stop() { active = false; cv.classList.remove('active'); if (raf) { cancelAnimationFrame(raf); raf = null } }
+      new IntersectionObserver(e => e[0].isIntersecting ? start() : stop(), { threshold: .15 }).observe(sec);
+      window.addEventListener('resize', () => { if (active) resize() });
+    })();
+
+    /* ════════════════════════════════════════════════════════
+       G — CTA ENERGY RINGS CANVAS
+    ════════════════════════════════════════════════════════ */
+    (function () {
+      const cv = document.getElementById('canvas-cta');
+      const sec = document.getElementById('cta');
+      const ctx = cv.getContext('2d');
+      let W, H, raf, active = false, time = 0, particles = [];
+      const RINGS = [{ period: 3200, phase: 0, w: 2, op: .5 }, { period: 4100, phase: 1000, w: 1.5, op: .35 },
+      { period: 2700, phase: 600, w: 1, op: .25 }, { period: 5000, phase: 2000, w: 2.5, op: .4 }, { period: 3600, phase: 800, w: 1, op: .2 }];
+
+      function burst() {
+        const cx = W / 2, cy = H / 2;
+        for (let i = 0; i < 20; i++) {
+          const ang = Math.random() * Math.PI * 2, spd = 1.5 + Math.random() * 3;
+          particles.push({ x: cx, y: cy, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 1, spd: .007 + Math.random() * .005 });
+        }
+      }
+      function resize() { W = sec.offsetWidth; H = sec.offsetHeight; cv.width = W; cv.height = H }
+
+      function draw() {
+        if (!active) { raf = null; return }
+        raf = requestAnimationFrame(draw); time += 16; ctx.clearRect(0, 0, W, H);
+        const cx = W / 2, cy = H / 2, maxR = Math.hypot(W, H) / 2;
+        const cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 280);
+        cg.addColorStop(0, `rgba(14,165,255,${.06 + .02 * Math.sin(time * .001)})`); cg.addColorStop(1, 'rgba(14,165,255,0)');
+        ctx.fillStyle = cg; ctx.beginPath(); ctx.arc(cx, cy, 280, 0, Math.PI * 2); ctx.fill();
+        RINGS.forEach(r => {
+          const t = ((time + r.phase) % r.period) / r.period, rad = t * maxR, op = r.op * (1 - t) * (1 - t);
+          ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.strokeStyle = `rgba(14,165,255,${op})`; ctx.lineWidth = r.w * (1 + t * .5); ctx.stroke();
+          ctx.beginPath(); ctx.arc(cx, cy, rad, 0, Math.PI * 2); ctx.strokeStyle = `rgba(180,230,255,${op * .4})`; ctx.lineWidth = r.w * .4; ctx.stroke();
+        });
+        particles = particles.filter(p => {
+          p.x += p.vx; p.y += p.vy; p.vx *= .97; p.vy *= .97; p.life -= p.spd; if (p.life <= 0) return false;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 2 * p.life, 0, Math.PI * 2); ctx.fillStyle = `rgba(14,165,255,${p.life * .8})`; ctx.fill();
+          return true;
+        });
+        const pulse = .5 + .5 * Math.sin(time * .002);
+        const ng = ctx.createRadialGradient(cx, cy, 0, cx, cy, 60 + pulse * 20);
+        ng.addColorStop(0, `rgba(14,165,255,${.2 + pulse * .15})`); ng.addColorStop(1, 'rgba(14,165,255,0)');
+        ctx.fillStyle = ng; ctx.beginPath(); ctx.arc(cx, cy, 60 + pulse * 20, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = `rgba(14,165,255,${.8 + pulse * .2})`; ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2); ctx.fill();
+        if (Math.floor(time / 3000) !== Math.floor((time - 16) / 3000)) burst();
+      }
+
+      function start() { if (active) return; resize(); active = true; cv.classList.add('active'); draw() }
+      function stop() { active = false; cv.classList.remove('active'); if (raf) { cancelAnimationFrame(raf); raf = null } }
+      new IntersectionObserver(e => e[0].isIntersecting ? start() : stop(), { threshold: .2 }).observe(sec);
+      window.addEventListener('resize', () => { if (active) resize() });
+    })();
+
+    /* ════════════════════════════════════════════════════════
+       H — NAV / FAQ / FORM / SCROLL
+    ════════════════════════════════════════════════════════ */
+    window.addEventListener('scroll', () => document.getElementById('nav').classList.toggle('scrolled', scrollY > 50));
+    const hbg = document.getElementById('hbg'), nl = document.getElementById('navLinks');
+    hbg.addEventListener('click', () => nl.classList.toggle('open'));
+    nl.querySelectorAll('a').forEach(a => a.addEventListener('click', () => nl.classList.remove('open')));
+    document.querySelectorAll('.faq-q').forEach(q => {
+      q.addEventListener('click', () => {
+        const it = q.parentElement, was = it.classList.contains('open');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+        if (!was) it.classList.add('open');
+      });
+    });
+    document.getElementById('cForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = document.getElementById('fn').value, srv = document.getElementById('fs').value, msg = document.getElementById('fm').value;
+      const txt = `Olá! Sou ${name} e gostaria de um orçamento.\n\nServiço: ${srv}${msg ? '\n\nProjeto: ' + msg : ''}`;
+      window.open(`https://wa.me/5511900000000?text=${encodeURIComponent(txt)}`, '_blank');
+      document.getElementById('formOk').classList.add('show'); this.reset();
+    });
+  </script>
+</body>
+
+</html>
