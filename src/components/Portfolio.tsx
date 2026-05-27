@@ -1,3 +1,87 @@
+import { useState, useEffect } from "react"
+
+const SLIDES = [
+  { src: '/projects/barbearia/telainicial.jpeg', alt: 'Tela inicial — Agendar Agora' },
+  { src: '/projects/barbearia/calendario.jpeg',  alt: 'Calendário e horário' },
+  { src: '/projects/barbearia/finaceiro.jpeg',   alt: 'Painel financeiro' },
+]
+
+function BarberCard() {
+  const [slide, setSlide] = useState(0)
+  const [paused, setPaused] = useState(false)
+
+  useEffect(() => {
+    if (paused) return
+    const t = setInterval(() => setSlide(s => (s + 1) % SLIDES.length), 2500)
+    return () => clearInterval(t)
+  }, [paused])
+
+  return (
+    <div className="port-card">
+      <div
+        className="port-img-wrap"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
+        <img key={slide} src={SLIDES[slide].src} alt={SLIDES[slide].alt} className="port-img" />
+        <div className="port-live-badge">
+          <span className="port-live-dot" />
+          Projeto real · No ar
+        </div>
+      </div>
+      <div className="port-dots">
+        {SLIDES.map((_, i) => (
+          <button
+            key={i}
+            className={`port-dot${i === slide ? ' active' : ''}`}
+            onClick={() => setSlide(i)}
+            aria-label={`Slide ${i + 1}`}
+          />
+        ))}
+      </div>
+      <div className="port-body">
+        <div className="port-niche">Barbearia</div>
+        <div className="port-title">Barbie Pro — Agendamento de Barbearia</div>
+        <div className="port-desc">
+          Sistema completo de agendamento online com painel administrativo. Cliente escolhe serviço,
+          profissional, data e horário em 4 etapas pelo celular. Dono gerencia agendamentos, clientes
+          e financeiro pelo admin — tudo em tempo real.
+        </div>
+        <ul className="port-features">
+          <li>✓ Agendamento em 4 etapas</li>
+          <li>✓ Gestão de profissionais</li>
+          <li>✓ Controle financeiro</li>
+          <li>✓ Histórico de clientes</li>
+        </ul>
+        <div className="port-links">
+          <a
+            href="https://barbie-pro-git-main-davidelmondes-projects.vercel.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="port-link-main"
+          >
+            Ver agendamento →
+          </a>
+          <a
+            href="https://barbie-pro-git-main-davidelmondes-projects.vercel.app/admin"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="port-link-sec"
+          >
+            Ver painel admin →
+          </a>
+        </div>
+        <div className="port-pills">
+          <span className="port-pill">React</span>
+          <span className="port-pill">Node.js</span>
+          <span className="port-pill">Neon PostgreSQL</span>
+          <span className="port-pill">Vercel</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Portfolio() {
   return (
     <section id="projetos">
@@ -10,20 +94,7 @@ export default function Portfolio() {
           <a href="#contato" className="btn-sec">Quero um projeto assim →</a>
         </div>
         <div className="port-grid">
-          <div className="port-card">
-            <div className="port-preview pp1">
-              <span className="port-emoji">✂️</span>
-              <div className="port-badge">Sistema Web</div>
-            </div>
-            <div className="port-body">
-              <div className="port-niche">Barbearia</div>
-              <div className="port-title">BarberPro — Agendamento Online</div>
-              <div className="port-desc">Calendário, perfil dos profissionais, histórico de clientes e controle financeiro integrado.</div>
-              <div className="port-pills">
-                <span className="port-pill">React</span><span className="port-pill">Node.js</span><span className="port-pill">Neon</span><span className="port-pill">Prisma</span>
-              </div>
-            </div>
-          </div>
+          <BarberCard />
           <div className="port-card">
             <div className="port-preview pp2">
               <span className="port-emoji">🏋️</span>
