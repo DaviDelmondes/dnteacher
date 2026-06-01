@@ -24,6 +24,8 @@ export default function ThreeBackground() {
     const canvas = canvasRef.current
     if (!canvas) return
 
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setSize(window.innerWidth, window.innerHeight)
@@ -34,9 +36,9 @@ export default function ThreeBackground() {
     const camera = new THREE.PerspectiveCamera(FOV, window.innerWidth / window.innerHeight, 1, 1400)
     camera.position.set(0, 0, 0)
 
-    const N = 400, HUB_N = 18, Z_NEAR = 8, Z_FAR = 1100
+    const N = isMobile ? 200 : 400, HUB_N = isMobile ? 9 : 18, Z_NEAR = 8, Z_FAR = 1100
     const HALF_FOV = (FOV * Math.PI / 180) / 2
-    const MAX_LINES = 1400, FLOW_N = 28
+    const MAX_LINES = isMobile ? 700 : 1400, FLOW_N = 28
 
     const pos    = new Float32Array(N * 3)
     const vel    = new Float32Array(N * 3)
@@ -156,25 +158,31 @@ export default function ThreeBackground() {
     window.addEventListener('resize', onR)
 
     // ── WARP INTERSTELAR ──
-    const warp = { speed: 32.0, stretch: 2.0 }
-    let warpActive = true
-    camera.far = 16000
-    camera.position.z = 12000
-    camera.fov = 130
-    camera.updateProjectionMatrix()
-    const warpTimeline = gsap.timeline({
-      delay: 1.2,
-      onComplete: () => { warpActive = false },
-    })
-    .to(camera.position, { z: 0, duration: 10.0, ease: 'expo.out' }, 0)
-    .to(camera, {
-      fov: 78, duration: 10.0,
-      ease: 'expo.out',
-      onUpdate: () => camera.updateProjectionMatrix(),
-    }, 0)
-    .to(warp, { speed: 1.0, duration: 9.0, ease: 'expo.out' }, 0)
-    .to(warp, { stretch: 0.0, duration: 8.0, ease: 'expo.out' }, 0)
-    .to(ptMat.uniforms.uWarp, { value: 0.0, duration: 8.0, ease: 'expo.out' }, 0)
+    const warp = { speed: isMobile ? 1.0 : 32.0, stretch: isMobile ? 0.0 : 2.0 }
+    let warpActive = !isMobile
+    let warpTimeline: gsap.core.Timeline
+    if (!isMobile) {
+      camera.far = 16000
+      camera.position.z = 12000
+      camera.fov = 130
+      camera.updateProjectionMatrix()
+      warpTimeline = gsap.timeline({
+        delay: 1.2,
+        onComplete: () => { warpActive = false },
+      })
+      .to(camera.position, { z: 0, duration: 10.0, ease: 'expo.out' }, 0)
+      .to(camera, {
+        fov: 78, duration: 10.0,
+        ease: 'expo.out',
+        onUpdate: () => camera.updateProjectionMatrix(),
+      }, 0)
+      .to(warp, { speed: 1.0, duration: 9.0, ease: 'expo.out' }, 0)
+      .to(warp, { stretch: 0.0, duration: 8.0, ease: 'expo.out' }, 0)
+      .to(ptMat.uniforms.uWarp, { value: 0.0, duration: 8.0, ease: 'expo.out' }, 0)
+    } else {
+      ptMat.uniforms.uWarp.value = 0.0
+      warpTimeline = gsap.timeline()
+    }
 
     const scrollTimeline = gsap.timeline({
       scrollTrigger: {
