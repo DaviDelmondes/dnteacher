@@ -3,8 +3,9 @@ import * as THREE from "three"
 import { gsap } from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { CustomEase } from "gsap/CustomEase"
-import MobileBackground from "@/components/MobileBackground"
 gsap.registerPlugin(ScrollTrigger, CustomEase)
+
+const isMobile = /iPhone|iPad|Android/i.test(navigator.userAgent) || window.innerWidth < 768
 
 const MODES: Record<string, { zm: number; sw: number; lo: number }> = {
   hero:     { zm: 1.0,  sw: 0.0,  lo: .11 },
@@ -19,19 +20,20 @@ const MODES: Record<string, { zm: number; sw: number; lo: number }> = {
 }
 
 export default function ThreeBackground() {
-  // No mobile, troca o WebGL por um fundo leve em Canvas 2D puro.
-  if (typeof window !== "undefined" && window.innerWidth < 768) {
-    return <MobileBackground />
-  }
-
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: !isMobile,
+      alpha: true,
+      precision: isMobile ? 'mediump' : 'highp',
+      powerPreference: isMobile ? 'low-power' : 'high-performance',
+    })
+    renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2))
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setClearColor(0, 0)
 
