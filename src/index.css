@@ -48,7 +48,7 @@ body{background:var(--ink);color:var(--white);font-family:'Instrument Sans',sans
 /* ── 3D CANVAS ── */
 #three-canvas{
   position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;
-  pointer-events:none;opacity:0;transition:opacity 2s ease;
+  display:block;pointer-events:none;opacity:0;transition:opacity 2s ease;
 }
 #three-canvas.ready{opacity:1}
 
@@ -99,7 +99,7 @@ nav.scrolled{border-bottom-color:var(--blue-border);background:rgba(4,6,10,.9)}
 }
 .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:dp 1.8s ease-in-out infinite}
 h1{
-  font-family:'Syne',sans-serif;font-size:clamp(3rem,5.5vw,5.4rem);
+  font-family:'Syne',sans-serif;font-size:clamp(2.2rem,8vw,5rem);
   font-weight:800;line-height:.97;letter-spacing:-.04em;margin-bottom:30px;
 }
 .h1-line{display:block;overflow:hidden}
@@ -302,6 +302,10 @@ footer{background:rgba(8,12,18,.92);backdrop-filter:blur(10px);border-top:1px so
 @media(max-width:768px){
   #intro-logo{font-size:clamp(2rem,8vw,3.5rem);white-space:nowrap;transform:scale(0.85)}
   #three-canvas{-webkit-transform:translateZ(0);transform:translateZ(0)}
+  .nav-cta{display:none}
+  .hamburger{display:flex}
+  .container{padding:0 16px}
+  #hero{overflow:hidden}
 }
 @media(max-width:640px){
   .nav-links{display:none}

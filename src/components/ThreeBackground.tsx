@@ -24,9 +24,9 @@ export default function ThreeBackground() {
     const canvas = canvasRef.current
     if (!canvas) return
 
-    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+    const isMobile = window.innerWidth < 768
 
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true })
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: !isMobile })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setClearColor(0, 0)
@@ -36,9 +36,9 @@ export default function ThreeBackground() {
     const camera = new THREE.PerspectiveCamera(FOV, window.innerWidth / window.innerHeight, 1, 1400)
     camera.position.set(0, 0, 0)
 
-    const N = isMobile ? 200 : 400, HUB_N = isMobile ? 9 : 18, Z_NEAR = 8, Z_FAR = 1100
+    const N = isMobile ? 80 : 400, HUB_N = isMobile ? 5 : 18, Z_NEAR = 8, Z_FAR = 1100
     const HALF_FOV = (FOV * Math.PI / 180) / 2
-    const MAX_LINES = isMobile ? 700 : 1400, FLOW_N = 28
+    const MAX_LINES = isMobile ? 300 : 1400, FLOW_N = isMobile ? 10 : 28
 
     const pos    = new Float32Array(N * 3)
     const vel    = new Float32Array(N * 3)
