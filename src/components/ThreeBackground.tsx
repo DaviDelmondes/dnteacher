@@ -57,12 +57,20 @@ export default function ThreeBackground() {
 
     let czm = 1.0, csw = 0.0, clo = .11
     let tzm = 1.0, tsw = 0.0, tlo = .11
-    const baseCamZ = 0
+    const baseCamZ = isMobile ? 80 : 0
+    const Z_RESET   = isMobile ? 70 : -5
+    const HUB_DIST  = isMobile ? 180 : 390
+    const NODE_DIST = isMobile ? 180 : 240
+    const SIZE_MUL  = isMobile ? 2.5 : 1
+    const LINE_MUL  = isMobile ? 3.6 : 1
+    const Z_SPAWN_NEAR = isMobile ? 50  : 200
+    const Z_SPAWN_SPAN = isMobile ? 250 : 2200
+    const Z_SCROLL_MUL = isMobile ? .25 : 1
     const cameraTarget = { z: 0, rotateY: 0 }
 
     function spawnAt(i: number, z?: number) {
-      const zz = z !== undefined ? z : (200 - Math.random() * 2200)
-      const d = Math.abs(zz), asp = window.innerWidth / window.innerHeight
+      const zz = z !== undefined ? z : (Z_SPAWN_NEAR - Math.random() * Z_SPAWN_SPAN)
+      const d = Math.abs(baseCamZ - zz), asp = window.innerWidth / window.innerHeight
       const hw = d * Math.tan(HALF_FOV) * 1.35, hh = hw / asp
       pos[i*3]   = (Math.random() - .5) * 2 * hw
       pos[i*3+1] = (Math.random() - .5) * 2 * hh
@@ -77,10 +85,10 @@ export default function ThreeBackground() {
       pPh[i]   = Math.random() * Math.PI * 2
       pSp[i]   = .01 + Math.random() * .022
       if (isHub[i]) {
-        aSz[i] = 7 + Math.random() * 5
+        aSz[i] = (7 + Math.random() * 5) * SIZE_MUL
         aCl[i*3] = .08; aCl[i*3+1] = .75; aCl[i*3+2] = 1
       } else {
-        aSz[i] = 1.8 + Math.random() * 2.8
+        aSz[i] = (1.8 + Math.random() * 2.8) * SIZE_MUL
         aCl[i*3] = .03 + Math.random() * .09
         aCl[i*3+1] = .44 + Math.random() * .28
         aCl[i*3+2] = .88 + Math.random() * .12
@@ -203,26 +211,26 @@ export default function ThreeBackground() {
       czm += (tzm - czm) * .018
       csw += (tsw - csw) * .018
       clo += (tlo - clo) * .018
-      lMat.opacity = clo
+      lMat.opacity = clo * LINE_MUL
 
       for (let i = 0; i < N; i++) {
         pos[i*3+2] += baseVZ[i] * czm * warp.speed
         const px = pos[i*3], py = pos[i*3+1], r2 = Math.sqrt(px*px+py*py) || 1
         pos[i*3]   += vel[i*3]   + (-py/r2) * csw * .5
         pos[i*3+1] += vel[i*3+1] + ( px/r2) * csw * .5
-        if (pos[i*3+2] > -5) spawnAt(i, -(Z_FAR*.55 + Math.random()*Z_FAR*.45))
+        if (pos[i*3+2] > Z_RESET) spawnAt(i, isMobile ? -(150 + Math.random()*50) : -(Z_FAR*.55 + Math.random()*Z_FAR*.45))
         pPh[i] += pSp[i]; const p = .5 + .5*Math.sin(pPh[i])
-        if (isHub[i]) { aSz[i] = (7+Math.random()*5)*(.6+p*.75); aCl[i*3+1] = .6+p*.32 }
-        else           { aSz[i] = (1.8+Math.random()*2.8)*(.82+p*.28) }
+        if (isHub[i]) { aSz[i] = (7+Math.random()*5)*(.6+p*.75)*SIZE_MUL; aCl[i*3+1] = .6+p*.32 }
+        else           { aSz[i] = (1.8+Math.random()*2.8)*(.82+p*.28)*SIZE_MUL }
       }
       pA.needsUpdate = true; sA.needsUpdate = true; cA.needsUpdate = true
 
       let lc = 0; aEdges = []
       outer: for (let i = 0; i < N; i++) {
-        const rng = isHub[i] ? 390 : 240
+        const rng = isHub[i] ? HUB_DIST : NODE_DIST
         for (let j = i+1; j < N; j++) {
           const dx=pos[i*3]-pos[j*3], dy=pos[i*3+1]-pos[j*3+1], dz=pos[i*3+2]-pos[j*3+2]
-          if (Math.sqrt(dx*dx+dy*dy+dz*dz) < (isHub[j]?390:rng)) {
+          if (Math.sqrt(dx*dx+dy*dy+dz*dz) < (isHub[j]?HUB_DIST:rng)) {
             const o=lc*6; lBuf[o]=pos[i*3];lBuf[o+1]=pos[i*3+1];lBuf[o+2]=pos[i*3+2]
             lBuf[o+3]=pos[j*3];lBuf[o+4]=pos[j*3+1];lBuf[o+5]=pos[j*3+2]
             aEdges.push([i,j]); if (++lc >= MAX_LINES) break outer
@@ -248,7 +256,7 @@ export default function ThreeBackground() {
       camera.rotation.order = 'YXZ'
       camera.rotation.x = cRX
       camera.rotation.y = cameraTarget.rotateY + cRY
-      if (!warpActive) camera.position.z = baseCamZ + cameraTarget.z
+      if (!warpActive) camera.position.z = baseCamZ + cameraTarget.z * Z_SCROLL_MUL
       renderer.render(scene, camera)
     }
 
