@@ -42,7 +42,7 @@ export default function ThreeBackground() {
     const camera = new THREE.PerspectiveCamera(FOV, window.innerWidth / window.innerHeight, 1, 1400)
     camera.position.set(0, 0, 0)
 
-    const N = 400, HUB_N = 18, Z_NEAR = 8, Z_FAR = 1100
+    const N = 400, HUB_N = 20, Z_NEAR = 8, Z_FAR = 2000
     const HALF_FOV = (FOV * Math.PI / 180) / 2
     const MAX_LINES = 1400, FLOW_N = 28
 
@@ -61,13 +61,13 @@ export default function ThreeBackground() {
     const cameraTarget = { z: 0, rotateY: 0 }
 
     function spawnAt(i: number, z?: number) {
-      const zz = z !== undefined ? z : -(Z_NEAR + Math.random() * (Z_FAR - Z_NEAR))
+      const zz = z !== undefined ? z : (200 - Math.random() * 2200)
       const d = Math.abs(zz), asp = window.innerWidth / window.innerHeight
       const hw = d * Math.tan(HALF_FOV) * 1.35, hh = hw / asp
       pos[i*3]   = (Math.random() - .5) * 2 * hw
       pos[i*3+1] = (Math.random() - .5) * 2 * hh
       pos[i*3+2] = zz
-      baseVZ[i]  = (isHub[i] ? .09 : .20) + Math.random() * (isHub[i] ? .12 : .38)
+      baseVZ[i]  = (isHub[i] ? .072 : .16) + Math.random() * (isHub[i] ? .096 : .304)
       vel[i*3]   = (Math.random() - .5) * .05
       vel[i*3+1] = (Math.random() - .5) * .05
     }
@@ -100,8 +100,8 @@ export default function ThreeBackground() {
       uniforms: { uWarp: { value: 1.0 } },
       vertexShader: `uniform float uWarp;attribute float aSize;attribute vec3 aColor;varying vec3 vC;varying float vO;
         void main(){vC=aColor;vec4 mv=modelViewMatrix*vec4(position,1.0);float d=-mv.z;
-        vO=clamp(1.8-d/800.0,0.05+uWarp*0.7,1.0);gl_PointSize=aSize*(280.0/max(d,1.0))*(1.0+uWarp*12.0);
-        gl_PointSize=clamp(gl_PointSize,0.5,120.0);gl_Position=projectionMatrix*mv;}`,
+        vO=clamp(1.8-d/800.0,0.05+uWarp*0.7,1.0);gl_PointSize=aSize*(280.0/max(d,1.0))*(1.0+uWarp*14.0);
+        gl_PointSize=clamp(gl_PointSize,0.5,300.0);gl_Position=projectionMatrix*mv;}`,
       fragmentShader: `uniform float uWarp;varying vec3 vC;varying float vO;
         void main(){vec2 u=gl_PointCoord-vec2(0.5);float d=length(u);if(d>.5)discard;
         float g=pow(1.0-d*2.0,1.5);float h=pow(max(0.0,1.0-d*1.4),0.4)*0.3;
@@ -164,25 +164,25 @@ export default function ThreeBackground() {
     window.addEventListener('resize', onR)
 
     // ── WARP INTERSTELAR ──
-    const warp = { speed: 32.0, stretch: 2.0 }
+    const warp = { speed: 20.0, stretch: 2.0 }
     let warpActive = true
     camera.far = 16000
     camera.position.z = 12000
-    camera.fov = 130
+    camera.fov = 140
     camera.updateProjectionMatrix()
     const warpTimeline = gsap.timeline({
       delay: 1.2,
       onComplete: () => { warpActive = false },
     })
-    .to(camera.position, { z: 0, duration: 10.0, ease: 'expo.out' }, 0)
+    .to(camera.position, { z: 0, duration: 5.0, ease: 'expo.out' }, 0)
     .to(camera, {
-      fov: 78, duration: 10.0,
+      fov: 78, duration: 5.0,
       ease: 'expo.out',
       onUpdate: () => camera.updateProjectionMatrix(),
     }, 0)
-    .to(warp, { speed: 1.0, duration: 9.0, ease: 'expo.out' }, 0)
-    .to(warp, { stretch: 0.0, duration: 8.0, ease: 'expo.out' }, 0)
-    .to(ptMat.uniforms.uWarp, { value: 0.0, duration: 8.0, ease: 'expo.out' }, 0)
+    .to(warp, { speed: 1.0, duration: 4.5, ease: 'expo.out' }, 0)
+    .to(warp, { stretch: 0.0, duration: 4.0, ease: 'expo.out' }, 0)
+    .to(ptMat.uniforms.uWarp, { value: 0.0, duration: 4.5, ease: 'expo.out' }, 0)
 
     const scrollTimeline = gsap.timeline({
       scrollTrigger: {
@@ -219,10 +219,10 @@ export default function ThreeBackground() {
 
       let lc = 0; aEdges = []
       outer: for (let i = 0; i < N; i++) {
-        const rng = isHub[i] ? 300 : 185
+        const rng = isHub[i] ? 390 : 240
         for (let j = i+1; j < N; j++) {
           const dx=pos[i*3]-pos[j*3], dy=pos[i*3+1]-pos[j*3+1], dz=pos[i*3+2]-pos[j*3+2]
-          if (Math.sqrt(dx*dx+dy*dy+dz*dz) < (isHub[j]?300:rng)) {
+          if (Math.sqrt(dx*dx+dy*dy+dz*dz) < (isHub[j]?390:rng)) {
             const o=lc*6; lBuf[o]=pos[i*3];lBuf[o+1]=pos[i*3+1];lBuf[o+2]=pos[i*3+2]
             lBuf[o+3]=pos[j*3];lBuf[o+4]=pos[j*3+1];lBuf[o+5]=pos[j*3+2]
             aEdges.push([i,j]); if (++lc >= MAX_LINES) break outer
